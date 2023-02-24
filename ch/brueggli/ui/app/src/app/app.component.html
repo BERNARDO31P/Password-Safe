@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand-lg bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="home">{{pageName}}</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBody" aria-controls="navbarBody" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarBody">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="home">Startseite</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="safe">Tresor</a>
+        </li>
+        <!--<li class="nav-item" *ngIf="admin">
+          <a class="nav-link" routerLink="admin">Admin Center</a>
+        </li>-->
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <!--<li class="nav-item dropdown" *ngIf="login else loggedOut">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{first_name + " " + last_name}}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" routerLink="auth/account">Konto</a></li>
+            <li><a class="dropdown-item" (click)="logout()">Abmelden</a></li>
+          </ul>
+        </li>
+        <ng-template #loggedOut>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="auth/login">Anmelden</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="auth/register">Registrieren</a>
+          </li>
+        </ng-template>-->
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-sm mt-6 p-3">
+  <router-outlet></router-outlet>
+</div>
