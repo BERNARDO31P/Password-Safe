@@ -1,0 +1,12 @@
+<h2>Anmeldung</h2>
+<form [formGroup]="formGroup" (ngSubmit)="login()">
+  <div class="mb-3">
+    <label for="email" class="form-label">Email-Adresse</label>
+    <input type="email" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Passwort</label>
+    <input type="password" class="form-control" id="password" placeholder="***********" formControlName="password" autocomplete="current-password">
+  </div>
+  <button type="submit" [disabled]="!formGroup.valid" class="btn btn-primary">Anmelden</button>
+</form>

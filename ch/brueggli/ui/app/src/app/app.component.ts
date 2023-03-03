@@ -1,6 +1,14 @@
 import {AfterViewInit, Component} from "@angular/core";
+import {Router} from "@angular/router";
+import {FormControl} from "@angular/forms";
+import {Title} from "@angular/platform-browser";
 
-import {URLSearchParamsPlus} from "../assets/js/url_searchparams";
+import {URLSearchParamsPlus} from "src/assets/js/url_searchparams";
+import {SharedService} from "src/assets/js/shared.service";
+
+import {User} from "src/assets/js/model/User";
+import Swal, {SweetAlertIcon} from "sweetalert2";
+
 
 export type Response = {
   message: string,
@@ -21,6 +29,7 @@ export class AppComponent implements AfterViewInit {
   protected pageName: string = "Password Safe";
   title: string = "";
 
+  constructor(protected shared: SharedService, protected router: Router, private titleService: Title) {}
 
   /**
    * Lifecycle-Methode, die nach der Initialisierung der Ansicht aufgerufen wird.
@@ -81,6 +90,12 @@ export class AppComponent implements AfterViewInit {
       parsed = JSON.parse(text) as Response;
     });
 
+    if (parsed.message) {
+      this.showMessage(parsed.message, parsed.status);
+    }
+
+    if (response.status === 403) this.logout();
+
     if (response.headers.has("Refresh")) {
       setTimeout(() => {
         location.reload();
@@ -88,5 +103,77 @@ export class AppComponent implements AfterViewInit {
     }
 
     return parsed;
+  }
+
+  /**
+   * Zeigt eine Benachrichtigung auf dem Bildschirm an
+   * @param {string} message Die Nachricht, die angezeigt werden soll
+   * @param {SweetAlertIcon} type Das Symbol, das in der Benachrichtigung angezeigt werden soll
+   */
+  protected showMessage(message: string, type: SweetAlertIcon): void {
+    Swal.fire({
+      title: message,
+      icon: type,
+      position: "top-end",
+      timer: 2000,
+      toast: true,
+      showConfirmButton: false,
+      timerProgressBar: true
+    });
+  }
+
+  /**
+   * Überprüft das FormControl-Objekt auf Gültigkeit.
+   * @param {FormControl<string | null>} control Das FormControl-Objekt, das auf Gültigkeit überprüft werden soll.
+   * @param {string} error Der optionale Fehler, der überprüft werden soll.
+   * @return {boolean} Gibt true zurück, wenn das FormControl-Objekt ungültig ist oder der übergebene Fehler vorliegt. Gibt false zurück, wenn das FormControl-Objekt gültig ist und kein Fehler vorliegt.
+   */
+  protected checkFormControl(control: FormControl<string | null>, error?: string): boolean {
+    if (control.dirty || control.touched) {
+      if (typeof error !== 'undefined') {
+        return control.hasError(error);
+      }
+      return control.invalid;
+    }
+    return false;
+  }
+
+  /**
+   * Setzt den Titel der Webseite und den aktiven Link in der Navigation.
+   * @param {string} location Der Name des Links, der aktuell angewählt wurde.
+   */
+  protected setLocation(location: string): void {
+    this.title = this.pageName + " - " + location;
+    this.titleService.setTitle(this.title);
+
+    let navElements = document.querySelectorAll(".nav-link");
+    navElements.forEach(element => {
+      let textContent = element.textContent!.split(" ")[0];
+
+      if (textContent.toLowerCase() !== location.toLowerCase()) {
+        element.classList.remove("active");
+        return;
+      }
+
+      element.classList.add("active");
+    });
+  }
+
+  /**
+   * Loggt den Benutzer aus und leitet ihn auf die Startseite weiter
+   */
+  protected logout() {
+    // Dies wird gemacht, da die "this"-Referenz mit der setTimeout Funktion überschrieben wird
+    let ngAfterViewInit = this.ngAfterViewInit;
+
+    this.request("GET", this.API_HOST + "/auth/logout").finally(() => {
+      this.shared.user = {} as User;
+
+      localStorage.removeItem("user");
+
+      this.router.navigateByUrl("/home").then(() => {
+        setTimeout(() => ngAfterViewInit());
+      });
+    });
   }
 }

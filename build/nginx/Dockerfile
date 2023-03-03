@@ -20,7 +20,7 @@ COPY --chown=nginx:nginx --from=build /app/node_modules /usr/share/nginx/html/no
 COPY /build/nginx/startup.sh /startup.sh
 
 # Installiere npm und Node.js
-RUN apk add npm nodejs=18.14.1-r0
+RUN apk add nodejs=18.14.2-r0 npm
 
 # Setze die Besitzerrechte für die kopierten Dateien auf den nginx-Benutzer und die nginx-Gruppe
 RUN chown nginx:nginx /usr/share/nginx/html

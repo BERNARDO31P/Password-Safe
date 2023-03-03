@@ -37,8 +37,14 @@ $router->setBasePath("/api");
 
 $router->set404("IOController@show404");
 
-//$router->before("GET|POST|PUT|DELETE", "/admin.*", "AuthController@checkAdmin");
-//$router->before("GET|POST|PUT|DELETE", "/safe.*", "AuthController@checkLogin");
+$router->before("GET|POST|PUT|DELETE", "/admin.*", "AuthController@checkAdmin");
+$router->before("GET|POST|PUT|DELETE", "/safe.*", "AuthController@checkLogin");
+
+$router->mount("/auth", function () use ($router) {
+	$router->post("/login", "AuthController@login");
+	$router->post("/register", "AuthController@register");
+	$router->get("/logout", "AuthController@logout");
+});
 
 $router->get("/health", "IOController@health");
 
