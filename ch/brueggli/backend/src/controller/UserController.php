@@ -10,6 +10,7 @@ use lib\DataRepo\DataRepo;
 
 use model\User;
 use model\Member;
+use model\SecretKey;
 
 use trait\getter;
 
@@ -51,8 +52,12 @@ class UserController extends AdminController
 		$this->sendResponse("success", array("public_key" => $user->public_key));
 	}
 
-	// TODO: Comment
-	#[NoReturn] public function getUserOrganizations($id): void
+	/**
+	 * Gibt alle Verbindungen zu Organisationen zurück, in welchen der Benutzer Mitglied ist.
+	 * @param int $id Die ID des Benutzers.
+	 * @return void
+	 */
+	#[NoReturn] public function getUserOrganizations(int $id): void
 	{
 		$member_entries = DataRepo::of(Member::class)->getByField("user_id", $id);
 
@@ -152,7 +157,7 @@ class UserController extends AdminController
 		$member = DataRepo::of(Member::class)->getByField("user_id", $id);
 		array_map(fn ($entry) => DataRepo::delete($entry), $member);
 
-		$secret_keys = DataRepo::of(Secret_Key::class)->getByField("user_id", $id);
+		$secret_keys = DataRepo::of(SecretKey::class)->getByField("user_id", $id);
 		array_map(fn ($entry) => DataRepo::delete($entry), $secret_keys);
 
 		$user = $this->_getUser($id);

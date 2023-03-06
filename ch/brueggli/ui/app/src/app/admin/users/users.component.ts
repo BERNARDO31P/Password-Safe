@@ -170,37 +170,14 @@ export class UsersComponent extends AdminComponent {
     });
   }
 
-  // TODO: Comment
+  /**
+   * Erneuert die Schlüssel von allen Organisationen.
+   * @returns {Promise<void>} - Ein Promise, welcher die asynchrone Handlung beendet.
+   */
   protected async renewOrganizationsKeys(): Promise<void> {
     return new Promise((resolve) => {
       this.request("GET", this.API_HOST + "/admin/organizations/keys").then(async response => {
-        if (response.status === "success") {
-          let data = [];
-
-          for (let org of response.data) {
-            let secret_key = await CryptUtils.decryptSecretKey(org.secret_key, this.shared.user.private_key as CryptoKey);
-            let org_data = await CryptUtils.decryptData(org.data, secret_key);
-
-            secret_key = await CryptUtils.generateSecretKey();
-            org_data = await CryptUtils.encryptData(org_data, secret_key);
-
-            let secret_keys = {} as { [key: string]: string };
-            for (let [user_id, public_key] of Object.entries(org.public_keys)) {
-              public_key = await CryptUtils.getPublicKey(public_key as string);
-
-              secret_keys[user_id as string] = await CryptUtils.encryptSecretKey(secret_key, public_key as CryptoKey);
-            }
-
-            data.push({
-              org_id: org.org_id,
-              data: org_data,
-              secret_keys: secret_keys,
-            });
-          }
-
-          this.request("PATCH", this.API_HOST + "/admin/organizations/keys", JSON.stringify({data: data}));
-          resolve();
-        }
+        // TODO: Redo, Database schema changed
       });
     });
   }

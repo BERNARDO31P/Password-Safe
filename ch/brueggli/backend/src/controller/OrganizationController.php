@@ -39,9 +39,11 @@ class OrganizationController extends AdminController
 		$this->sendResponse("success", null, "Der neue Schlüssel wurde für die Organisation mit der ID {org_id} gesetzt", ["org_id" => $secret_key->org_id]);
 	}
 
-	// TODO: Comment
 	/**
-	 * @throws Exception
+	 * Setzt eine Verbindung zwischen einem Benutzer und einer Organisation.
+	 * Fügt somit einen Benutzer zu einer Organisation hinzu.
+	 * @return void
+	 * @throws Exception Siehe DataRepo
 	 */
 	#[NoReturn] public function setOrganizationMember(): void
 	{
@@ -56,7 +58,12 @@ class OrganizationController extends AdminController
 		$this->sendResponse("success", null, "Der Benutzer wurde zur Organisation {org_name} hinzugefügt", ["org_name" => $org->name]);
 	}
 
-	// TODO: Comment
+	/**
+	 * Löscht die Verbindung zwischen einem Benutzer und einer Organisation.
+	 * Entfernt somit einen Benutzer aus einer Organisation.
+	 * @return void
+	 * @throws Exception Siehe DataRepo
+	 */
 	#[NoReturn] public function deleteOrganizationMember(): void
 	{
 		$this->checkPostArguments(["member"]);
