@@ -2,13 +2,13 @@
 
 namespace model;
 
+use JsonSerializable;
+
 use lib\DataRepo\trait\model;
 use lib\DataRepo\feature\db_column;
 use lib\DataRepo\feature\db_foreign_key;
 
-use JsonSerializable;
-
-class Secret_Key implements JsonSerializable
+class SecretKey implements JsonSerializable
 {
 	use model;
 
@@ -19,6 +19,7 @@ class Secret_Key implements JsonSerializable
 	public ?int $secret_id = null;
 	#[db_column]
 	public string $secret_key = "";
+
 	#[db_column, db_foreign_key(User::class)]
 	public int $user_id = 0;
 	#[db_column, db_foreign_key(Organization::class)]

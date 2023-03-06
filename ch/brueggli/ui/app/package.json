@@ -23,10 +23,11 @@
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
     "bootstrap-select": "^1.14.0-beta3",
-    "sweetalert2": "^11.7.1",
-    "randexp": "^0.5.3",
     "jquery": "^3.6.3",
+    "ngx-pagination": "^6.0.3",
+    "randexp": "^0.5.3",
     "rxjs": "~7.8.0",
+    "sweetalert2": "^11.7.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
   },

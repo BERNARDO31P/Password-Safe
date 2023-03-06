@@ -1,0 +1,71 @@
+<div>
+  <h4 class="d-inline">Verwaltung Organisationen</h4>
+  <button class="btn float-end" (click)="add()">Hinzufügen</button>
+</div>
+<form>
+  <div class="mb-3">
+    <input (input)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
+  </div>
+</form>
+<ng-container *ngIf="hasData(organizations) === 0 else nodata">
+  <div class="overflow-auto h-table">
+    <table class="table">
+      <thead>
+      <tr>
+        <th class="text-nowrap" *ngFor="let key of Object.keys(organizations.data[0]) | slice: 1: 3">{{translation[key]}}</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr (contextmenu)="updateContext($event)" *ngFor="let org of organizations.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: organizations.count}" [attr.data-id]="org.org_id">
+          <td *ngFor="let value of Object.values(org) | slice:1: 3">{{value}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="has-text-centered mt-2" *ngIf="organizations.count! / PAGE_COUNT > 1">
+    <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}"></pagination-controls>
+  </div>
+</ng-container>
+
+<ng-template #nodata>
+  <ng-container *ngIf="hasData(organizations) === 2 else loading">
+    <span class="error">Leider wurden keine Daten gefunden!</span>
+  </ng-container>
+  <ng-template #loading>
+    <div class="spinner">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  </ng-template>
+</ng-template>
+
+<div id="contextmenu" #context>
+  <!--<button class="btn" (click)="renewOrganizationKeys()">Schlüssel erneuern</button>-->
+  <button class="btn" (click)="edit()">Bearbeiten</button>
+  <button class="btn" (click)="delete()">Löschen</button>
+</div>
+<div #modal class="modal" tabindex="-1" [attr.data-id]="organization.org_id">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Benutzerverwaltung</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formGroup" (ngSubmit)="save()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Brüggli" formControlName="name" autocomplete="name">
+          </div>
+          <div class="mb-2">
+            <label for="description" class="form-label">Beschreibung</label>
+            <input type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

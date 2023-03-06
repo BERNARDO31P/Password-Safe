@@ -1,0 +1,19 @@
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Administration</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="navbar-nav flex-column me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a data-bs-dismiss="offcanvas" class="nav-link" routerLink="users">Benutzer</a>
+      </li>
+      <li class="nav-item">
+        <a data-bs-dismiss="offcanvas" class="nav-link" routerLink="organizations">Organisationen</a>
+      </li>
+    </ul>
+  </div>
+</div>
+<button id="sidebar-open" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar"><i class="bi bi-caret-right-fill"></i></button>
+
+<router-outlet></router-outlet>

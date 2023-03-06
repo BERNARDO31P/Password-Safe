@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace controller;
 
@@ -31,6 +31,7 @@ class AuthController extends IOController
 		$this->checkPostArguments(["email", "password"]);
 
 		$user = DataRepo::of(User::class)->getByField("email", $_POST["email"]);
+
 		if (count($user) && $user[0]->password == $_POST["password"]) {
 			if (boolval($user[0]->is_suspended) === true) {
 				$this->sendResponse("error", null, "Dieses Konto {email} ist gesperrt", ["email" => $_POST["email"]], 403);

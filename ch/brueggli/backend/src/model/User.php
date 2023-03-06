@@ -1,14 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace model;
-
-use lib\DataRepo\feature\db_column;
-use lib\DataRepo\trait\model;
 
 use JsonSerializable;
 
+use lib\DataRepo\feature\db_column;
+use lib\DataRepo\trait\model;
 class User implements JsonSerializable
 {
 	use model;

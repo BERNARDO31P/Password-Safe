@@ -1,4 +1,5 @@
 import {User} from "./model/User";
+import {SecretKey} from "./model/SecretKey";
 
 export class CryptUtils {
   /**
@@ -135,6 +136,66 @@ export class CryptUtils {
   }
 
   /**
+   * Entschlüsselt den gegebenen Base64-kodierten Schlüssel mit dem gegebenen privaten Schlüssel.
+   * Gibt den entschlüsselten Schlüssel als CryptoKey-Objekt zurück.
+   * @param {string} base64Key Der Base64-kodierte Schlüssel, der entschlüsselt werden soll.
+   * @param {CryptoKey} privateKey Der private Schlüssel, der zum Entschlüsseln des Schlüssels verwendet werden soll.
+   * @return {Promise<CryptoKey>} Das entschlüsselte CryptoKey-Objekt.
+   */
+  static async decryptSecretKey(base64Key: string, privateKey: CryptoKey): Promise<CryptoKey> {
+    const encrypted = this.base64ToArray(base64Key);
+    const decrypted = await crypto.subtle.decrypt({name: "RSA-OAEP"}, privateKey, encrypted);
+
+    return await crypto.subtle.importKey("raw", decrypted, {name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"]);
+  }
+
+  /**
+   * Verschlüsselt den geheimen Schlüssel mit dem gegebenen öffentlichen Schlüssel und gibt das Ergebnis als base64-kodierten String zurück.
+   * @param {CryptoKey} secretKey Der zu verschlüsselnde geheime Schlüssel
+   * @param {CryptoKey} publicKey Der öffentliche Schlüssel, mit dem der geheime Schlüssel verschlüsselt werden soll
+   * @return {Promise<string>} Ein base64-kodierter String, der den verschlüsselten geheimen Schlüssel repräsentiert
+   */
+  static async encryptSecretKey(secretKey: CryptoKey, publicKey: CryptoKey): Promise<string> {
+    let key = await crypto.subtle.exportKey("raw", secretKey);
+    let encrypted = await crypto.subtle.encrypt({name: "RSA-OAEP"}, publicKey, key);
+
+    return this.arrayToBase64(encrypted);
+  }
+
+  /**
+   * Entschlüsselt die gegebenen Base64-kodierten Daten mit dem gegebenen Schlüssel.
+   * Gibt die entschlüsselten Daten als Zeichenfolge zurück.
+   * @param {string} base64Data Die Base64-kodierten Daten, die entschlüsselt werden sollen.
+   * @param {CryptoKey} secretKey Der Schlüssel, der zum Entschlüsseln der Daten verwendet werden soll.
+   * @return {Promise<string>} Die entschlüsselten Daten als Zeichenfolge.
+   */
+  static async decryptData(base64Data: string, secretKey: CryptoKey): Promise<string> {
+    if (!base64Data) return base64Data;
+
+    const encrypted = this.base64ToArray(base64Data);
+    let split = this.splitArrayBuffer(encrypted, 16);
+
+    const decrypted = await crypto.subtle.decrypt({name: "AES-GCM", iv: split[0], length: 256, tagLength: 128}, secretKey, split[1]);
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  /**
+   * Verschlüsselt die gegebenen Daten mit dem gegebenen Schlüssel.
+   * Gibt die verschlüsselten Daten als Base64-kodierte Zeichenfolge zurück.
+   * @param {string} data Die zu verschlüsselnden Daten als Zeichenfolge.
+   * @param {CryptoKey} secretKey Der Schlüssel, der zum Verschlüsseln der Daten verwendet werden soll.
+   * @return {Promise<string>} Die verschlüsselten Daten als Base64-kodierte Zeichenfolge.
+   */
+  static async encryptData(data: string, secretKey: CryptoKey): Promise<string> {
+    const iv = crypto.getRandomValues(new Uint8Array(16));
+    const encoded = new TextEncoder().encode(data);
+    const encrypted = await crypto.subtle.encrypt({name: "AES-GCM", iv: iv, length: 256, tagLength: 128}, secretKey, encoded);
+
+    return this.arrayToBase64(this.concatenateArrayBuffers(iv, encrypted));
+  }
+
+  /**
    * Leitet einen geheimen Schlüssel aus dem gegebenen Passwort und Salt ab.
    * Das abgeleitete Schlüsselobjekt kann dann zum Verschlüsseln und Entschlüsseln von Daten verwendet werden.
    * @param {string} password Das Passwort, aus dem der Schlüssel abgeleitet werden soll.
@@ -184,4 +245,46 @@ export class CryptUtils {
     ) as CryptoKeyPair;
   }
 
+  /**
+   * Generiert einen neuen geheimen Schlüssel mit den folgenden Eigenschaften:
+   * Algorithmus: AES-GCM
+   * Schlüssellänge: 256 Bit
+   * @return {Promise<CryptoKey>} Der generierte geheime Schlüssel als CryptoKey-Objekt.
+   */
+  static async generateSecretKey(): Promise<CryptoKey> {
+    return await crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: 256
+      },
+      true,
+      ["encrypt", "decrypt"]
+    ) as CryptoKey;
+  }
+
+  /**
+   * Generiert geheime Schlüssel und verschlüsselt diese mit den öffentlichen Schlüsseln der gegebenen Benutzer.
+   * Gibt ein assoziatives Array zurück, das die Benutzer-IDs als Schlüssel und die Base64-kodierten Schlüssel als Werte enthält.
+   * @param {Array<User>} users Ein Array von Benutzern, deren öffentliche Schlüssel zur Verschlüsselung der geheimen Schlüssel verwendet werden sollen.
+   * @param {number} org_id Die ID der Organisation, für welche die geheimen Schlüssel generiert werden sollen.
+   * @return {Promise<Record<number, string>>} Ein assoziatives Array, das die Benutzer-IDs als Schlüssel und die Base64-kodierten geheimen Schlüssel als Werte enthält.
+   */
+  static async generateSecretKeys(users: Array<User>, org_id: number): Promise<Array<SecretKey>> {
+    let secret_key = await this.generateSecretKey();
+    let secret_keys = [] as Array<SecretKey>;
+
+    for (let user of users) {
+      let public_key = await this.getPublicKey(user.public_key as string);
+
+      let secret_key_entry = {
+        secret_key: await this.encryptSecretKey(secret_key, public_key as CryptoKey),
+        user_id: user.user_id,
+        org_id: org_id
+      } as SecretKey;
+
+      secret_keys.push(secret_key_entry);
+    }
+
+    return secret_keys;
+  }
 }

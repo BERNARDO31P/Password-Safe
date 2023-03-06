@@ -1,4 +1,4 @@
-type Secret_key = {
+export type SecretKey = {
   secret_id?: number,
   secret_key: CryptoKey | string,
   user_id: number,

@@ -1,13 +1,14 @@
 import {AfterViewInit, Component} from "@angular/core";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {FormControl} from "@angular/forms";
 import {Title} from "@angular/platform-browser";
+import Swal, {SweetAlertIcon} from "sweetalert2";
 
 import {URLSearchParamsPlus} from "src/assets/js/url_searchparams";
 import {SharedService} from "src/assets/js/shared.service";
+import {CryptUtils} from "src/assets/js/crypt_utils";
 
 import {User} from "src/assets/js/model/User";
-import Swal, {SweetAlertIcon} from "sweetalert2";
 
 
 export type Response = {
@@ -23,13 +24,28 @@ export type Response = {
   styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements AfterViewInit {
-
+  protected PAGE_COUNT: number = 10;
   protected API_HOST: string = window.location.origin + "/api";
+
+  protected searching: boolean = true;
 
   protected pageName: string = "Password Safe";
   title: string = "";
+  Object = Object;
 
-  constructor(protected shared: SharedService, protected router: Router, private titleService: Title) {}
+  constructor(protected shared: SharedService, private titleService: Title, protected router: Router, protected route: ActivatedRoute) {
+    if (this.shared.user.user_id === undefined) {
+      let data = localStorage.getItem("user");
+      if (data) {
+        let encrypted = JSON.parse(data);
+        this.shared.user = encrypted;
+
+        CryptUtils.decryptUser(encrypted, encrypted["password"]).then(user => {
+          this.shared.user = user;
+        });
+      }
+    }
+  }
 
   /**
    * Lifecycle-Methode, die nach der Initialisierung der Ansicht aufgerufen wird.
@@ -94,7 +110,7 @@ export class AppComponent implements AfterViewInit {
       this.showMessage(parsed.message, parsed.status);
     }
 
-    if (response.status === 403) this.logout();
+    if (response.status === 403) this.logout(false);
 
     if (response.headers.has("Refresh")) {
       setTimeout(() => {
@@ -160,13 +176,86 @@ export class AppComponent implements AfterViewInit {
   }
 
   /**
+   * Überprüft, ob das bereitgestellte Datenobjekt gültige Daten enthält.
+   * @param {object} data - Das zu überprüfende Datenobjekt.
+   * @returns {number} - Gibt 0 zurück, wenn die Daten gültig sind.
+   *                    1, wenn die Daten nicht definiert/leer sind.
+   *                    2, wenn die Daten ungültig sind.
+   */
+  protected hasData(data: {data: Array<any>|string, count?: number}): number
+  {
+    if (data === undefined) return 1;
+    if (data.data === undefined || data.data.length === 0 || typeof data.data === "string") return 2;
+    return 0;
+  }
+
+  /**
+   * Aktualisiert das Kontextmenü und zeigt ihn an.
+   * Die ID vom Datensatz wird gesetzt.
+   * Event-Listener werden gesetzt, damit das Menü sich wieder schliesst.
+   * @param {MouseEvent} event Das Ereignis, das den Kontextmenü-Dialog ausgelöst hat.
+   * @param {function} callback Die Rückruffunktion, die aufgerufen wird, wenn das Kontextmenü angezeigt wird.
+   */
+  protected updateContext(event: MouseEvent, callback: (id: number, context: HTMLDivElement) => void = () => {
+  }) {
+    event.preventDefault();
+
+    let context = document.getElementById("contextmenu") as HTMLDivElement;
+    let id = (event.currentTarget as HTMLTableRowElement).dataset["id"];
+    context.dataset["id"] = id;
+
+    context.style.top = event.pageY - 5 + "px";
+    context.style.left = event.pageX - 5 + "px";
+
+    document.addEventListener('click', function contextClose(event: MouseEvent) {
+      let element = event.target as HTMLElement;
+
+      if (!element.closest("#contextmenu")) {
+        context.classList.remove("show");
+        document.removeEventListener('click', contextClose);
+      }
+    });
+
+    let contextButtons = context.querySelectorAll("button");
+    contextButtons.forEach(contextButton => {
+      if (contextButton.getAttribute("listener") !== "true") {
+        contextButton.setAttribute("listener", "true");
+
+        contextButton.addEventListener("click", () => {
+          context.classList.remove("show");
+        });
+      }
+    });
+
+    callback(Number(id), context);
+
+    context.classList.add("show");
+  }
+
+  /**
+   * Führt eine Suche auf dem Server durch und ruft die angegebene Callback-Funktion mit der Antwort vom Server auf.
+   * @param {Event} event Das auslösende Event.
+   * @param {string} endpoint Der API-Endpunkt, auf dem gesucht werden soll.
+   * @param {function} callback Die Callback-Funktion, die mit der Antwort aufgerufen werden soll.
+   */
+  protected search(event: Event, endpoint: string, callback: (response: Response) => void) {
+    let input = event.currentTarget as HTMLInputElement;
+
+    this.searching = Boolean(input.value);
+
+    this.request("GET", endpoint + input.value).then(response => {
+      callback(response);
+    });
+  }
+
+  /**
    * Loggt den Benutzer aus und leitet ihn auf die Startseite weiter
    */
-  protected logout() {
+  protected logout(request: boolean = true) {
     // Dies wird gemacht, da die "this"-Referenz mit der setTimeout Funktion überschrieben wird
     let ngAfterViewInit = this.ngAfterViewInit;
 
-    this.request("GET", this.API_HOST + "/auth/logout").finally(() => {
+    let callback = () => {
       this.shared.user = {} as User;
 
       localStorage.removeItem("user");
@@ -174,6 +263,10 @@ export class AppComponent implements AfterViewInit {
       this.router.navigateByUrl("/home").then(() => {
         setTimeout(() => ngAfterViewInit());
       });
-    });
+    }
+
+    if (request) {
+      this.request("GET", this.API_HOST + "/auth/logout").finally(callback);
+    } else callback();
   }
 }

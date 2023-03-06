@@ -1,0 +1,89 @@
+<h4 class="d-inline">Verwaltung Benutzer</h4>
+<form>
+  <div class="mb-3">
+    <input (input)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
+  </div>
+</form>
+<ng-container *ngIf="hasData(users) === 0 else nodata">
+  <div class="overflow-auto h-table">
+    <table class="table">
+      <thead>
+      <tr>
+        <th class="text-nowrap" *ngFor="let key of Object.keys(users.data[0]) | slice:1">{{translation[key]}}</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr (contextmenu)="updateContext($event)" *ngFor="let user of users.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: users.count}" [attr.data-id]="user.user_id">
+          <td>{{user.email}}</td>
+          <td>{{user.first_name}}</td>
+          <td>{{user.last_name}}</td>
+          <td>{{user.is_admin | yesNo}}</td>
+          <td>{{user.is_suspended | yesNo}}</td>
+          <td *ngIf="user.last_login">{{user.last_login * 1000 | date: "dd.MM.yyyy - HH:mm"}}</td>
+          <td *ngIf="!user.last_login">Keine Anmeldung</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="has-text-centered mt-2" *ngIf="users.count! / PAGE_COUNT > 1">
+    <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}"></pagination-controls>
+  </div>
+</ng-container>
+
+<ng-template #nodata>
+  <ng-container *ngIf="hasData(users) === 2 else loading">
+    <span class="error">Leider wurden keine Daten gefunden!</span>
+  </ng-container>
+  <ng-template #loading>
+    <div class="spinner">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  </ng-template>
+</ng-template>
+
+<div id="contextmenu" #context>
+  <button class="btn" (click)="redirect($event, 'orgs')">Organisationen</button>
+  <button class="btn" (click)="edit()">Bearbeiten</button>
+  <button class="btn" (click)="delete()">Löschen</button>
+</div>
+
+<div #modal class="modal" tabindex="-1" [attr.data-id]="user.user_id">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Benutzerverwaltung</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formGroup" (ngSubmit)="save()">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email-Adresse</label>
+            <input type="email" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
+          </div>
+          <div class="mb-2">
+            <label for="first_name" class="form-label">Vorname</label>
+            <input type="text" class="form-control" id="first_name" placeholder="Hans" formControlName="first_name" autocomplete="first_name">
+          </div>
+          <div class="mb-2">
+            <label for="last_name" class="form-label">Nachname</label>
+            <input type="text" class="form-control" id="last_name" placeholder="Muster" formControlName="last_name" autocomplete="last_name">
+          </div>
+          <div class="mb-2">
+            <label for="is_admin" class="form-label">Administrator</label>
+            <input type="checkbox" class="form-check" id="is_admin" formControlName="is_admin">
+          </div>
+          <div class="mb-2">
+            <label for="is_suspended" class="form-label">Ausgeschlossen</label>
+            <input type="checkbox" class="form-check" id="is_suspended" formControlName="is_suspended">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

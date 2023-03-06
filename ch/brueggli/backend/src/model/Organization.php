@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace model;
 
+use JsonSerializable;
+
 use lib\DataRepo\trait\model;
 use lib\DataRepo\feature\db_column;
-
-use JsonSerializable;
 
 class Organization implements JsonSerializable
 {
