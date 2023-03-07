@@ -47,11 +47,16 @@ $router->mount("/auth", function () use ($router) {
 	$router->get("/logout", "AuthController@logout");
 });
 
+$router->mount("/safe/{id}", function () use ($router) {
+		$router->get("/", "SafeController@getData");
+		$router->patch("/", "SafeController@setData");
+});
+
 $router->mount("/admin", function () use ($router) {
 	$router->mount("/users", function () use ($router) {
 		$router->get("/admins", "UserController@getAdmins");
 
-		$router->get("/{search}", "UserController@searchUsers");
+		$router->get("/{search}", "UserController@search");
 
 		$router->get("/", "UserController@getUsers");
 	});
@@ -60,21 +65,25 @@ $router->mount("/admin", function () use ($router) {
 		$router->get("/key", "UserController@getUserKey");
 		$router->get("/organizations", "UserController@getUserOrganizations");
 
+		$router->delete("/admin", "UserController@removeAdmin");
+
 		$router->get("/", "UserController@getUser");
 		$router->patch("/", "UserController@editUser");
 		$router->delete("/", "UserController@deleteUser");
 	});
 
 	$router->mount("/organization", function () use ($router) {
-		$router->patch("/keys", "OrganizationController@setOrganizationKeys");
+		$router->post("/keys", "OrganizationController@setOrganizationKeys");
+		$router->patch("/keys", "OrganizationController@updateOrganizationKeys");
 
-		$router->patch("/key", "OrganizationController@setOrganizationKey");
+		$router->post("/key", "OrganizationController@setOrganizationKey");
 
-		$router->patch("/member", "OrganizationController@setOrganizationMember");
+		$router->post("/member", "OrganizationController@setOrganizationMember");
 		$router->delete("/member", "OrganizationController@deleteOrganizationMember");
 
 		$router->mount("/{id}", function () use ($router) {
 			$router->get("/key", "OrganizationController@getOrganizationKey");
+			$router->get("/members", "OrganizationController@getOrganizationMembers");
 
 			$router->patch("/", "OrganizationController@editOrganization");
 
@@ -85,8 +94,15 @@ $router->mount("/admin", function () use ($router) {
 	$router->mount("/organizations", function () use ($router) {
 		$router->get("/", "OrganizationController@getOrganizations");
 
+		$router->get("/key", "OrganizationController@getOrganizationsKey");
+		$router->post("/key", "OrganizationController@setOrganizationsKey");
+
+		$router->get("/{search}", "OrganizationController@search");
+
 		$router->post("/", "OrganizationController@addOrganization");
 	});
+
+
 });
 
 $router->get("/health", "IOController@health");

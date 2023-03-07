@@ -22,6 +22,20 @@ class OrganizationController extends AdminController
 	use getter;
 
 	/**
+	 * Sucht Organisationen anhand des Suchstrings und gibt sie in paginierter Form zurück.
+	 * @param string $search Der Suchstring.
+	 * @return void
+	 */
+	#[NoReturn] public function search(string $search): void
+	{
+		$page = intval($_GET["page"] ?? 1);
+		$orgs = DataRepo::of(Organization::class)->searchPaged($page - 1, $search);
+
+		$this->writeLog("Suchanfrage in Organisationen: {search}", ["search" => $search]);
+		$this->sendResponse("success", $orgs);
+	}
+
+	/**
 	 * Setzt einen neuen symmetrischen Schlüssel für eine Organisation anhand ihrer ID.
 	 * @param int $id Die ID der Organisation.
 	 * @return void
@@ -33,10 +47,54 @@ class OrganizationController extends AdminController
 
 		$secret_key = SecretKey::fromObj($_POST["secret_key"]);
 
-		if (!DataRepo::insert($secret_key)) {
+		$entries = DataRepo::of(SecretKey::class)->getByFields([
+			"user_id" => $secret_key->user_id,
+			"org_id" => $secret_key->org_id
+		]);
+
+		if (!count($entries) && !DataRepo::insert($secret_key)) {
 			$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation mit der ID {org_id} ist ein Fehler aufgetreten", ["org_id" => $secret_key->org_id], 500);
 		}
-		$this->sendResponse("success", null, "Der neue Schlüssel wurde für die Organisation mit der ID {org_id} gesetzt", ["org_id" => $secret_key->org_id]);
+		$this->sendResponse("success");
+	}
+
+	/**
+	 * TODO: Comment
+	 * @throws Exception
+	 */
+	public function setOrganizationKeys(): void
+	{
+		$this->checkPostArguments(["secret_keys"]);
+
+		foreach ($_POST["secret_keys"] as $secret_key) {
+			$secret_key = SecretKey::fromObj($secret_key);
+			DataRepo::insert($secret_key);
+		}
+	}
+
+	/**
+	 * TODO: Comment
+	 * @throws Exception
+	 */
+	public function updateOrganizationKeys(): void
+	{
+		$this->checkPostArguments(["secret_keys"]);
+
+		foreach ($_POST["secret_keys"] as $secret_key) {
+			$secret_key = SecretKey::fromObj($secret_key);
+			DataRepo::update($secret_key);
+		}
+	}
+
+
+	// TODO: Comment
+	#[NoReturn] public function getOrganizationMembers(int $id): void
+	{
+		$page = intval($_GET["page"] ?? 1);
+		$members = DataRepo::of(Member::class)->getByFieldPaged($page - 1, "org_id", $id);
+
+		//$this->writeLog("Suchanfrage in Mitglieder: {search}", ["search" => $search]);
+		$this->sendResponse("success", $members);
 	}
 
 	/**
@@ -68,10 +126,21 @@ class OrganizationController extends AdminController
 	{
 		$this->checkPostArguments(["member"]);
 
-		$member = DataRepo::of(Member::class)->getByFields($_POST["member"])[0];
+		$member = DataRepo::of(Member::class)->getByFields($_POST["member"]);
+		$secret_key = DataRepo::of(SecretKey::class)->getByFields($_POST["member"]);
 
-		$org = $this->_getOrganization($member->org_id);
-		if (!DataRepo::delete($member)) {
+		if (!count($member) || !count($secret_key)) {
+			$this->sendResponse("error", null, "Keine Daten gefunden", null, 400);
+		}
+
+		$org = $this->_getOrganization($member[0]->org_id);
+		$user = $this->_getUser($member[0]->user_id);
+
+		if (!$user->is_admin && !DataRepo::delete($secret_key[0])) {
+			$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
+		}
+
+		if (!DataRepo::delete($member[0])) {
 			$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
 		}
 		$this->sendResponse("success", null, "Der Benutzer wurde aus der Organisation {org_name} entfernt", ["org_name" => $org->name]);
@@ -88,29 +157,52 @@ class OrganizationController extends AdminController
 		$secret_key = DataRepo::of(SecretKey::class)->getByFields([
 			"org_id" => $id,
 			"user_id" => $_SESSION["user_id"]
-		])[0];
+		]);
+
+		if (!count($secret_key)) {
+			$this->sendResponse("error", null, "Keine Daten gefunden", null, 400);
+		}
 
 		$org = $this->_getOrganization($id);
 		$this->writeLog("Auslesen vom eigenen symmetrischen Schlüssel der Organisation {org_name}", ["org_name" => $org->name]);
-		$this->sendResponse("success", array("secret_key" => $secret_key->secret_key));
+		$this->sendResponse("success", $secret_key[0]);
+	}
+
+	// TODO: Comment
+	#[NoReturn] public function getOrganizationsKey(): void
+	{
+		$page = intval($_GET["page"] ?? 1);
+		$secret_keys = DataRepo::of(SecretKey::class)->getByFieldPaged($page - 1, "user_id", $_SESSION["user_id"]);
+
+		$this->sendResponse("success", $secret_keys);
+	}
+
+	/**
+	 * // TODO: Comment
+	 * @throws Exception
+	 */
+	public function setOrganizationsKey(): void
+	{
+		$this->checkPostArguments(["secret_keys"]);
+
+		foreach ($_POST["secret_keys"] as $secret_key) {
+			$secret_key = SecretKey::fromObj($secret_key);
+			DataRepo::insert($secret_key);
+		}
 	}
 
 	/**
 	 * Gibt alle Organisationen in paginierter Form zurück.
 	 * @return void
-	 * @throws ReflectionException Siehe getArrayKeys()
 	 */
 	#[NoReturn] public function getOrganizations(): void
 	{
 		$page = intval($_GET["page"] ?? 1);
 		$orgs = DataRepo::of(Organization::class)->getAllPaged($page - 1);
 
-		$orgs["data"] = getArrayKeys($orgs["data"], ["org_id", "name", "description", "members"]);
-
 		$this->writeLog("Auslesen der {page}. Seite von allen Organisationen", ["page" => $page]);
 		$this->sendResponse("success", $orgs);
 	}
-
 
 	/**
 	 * Fügt eine neue Organisation hinzu.
@@ -127,18 +219,6 @@ class OrganizationController extends AdminController
 			$this->sendResponse("error", null, "Beim Hinzufügen der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
 		}
 		$this->sendResponse("success", $org->toArray(), "Die Organisation {org_name} wurde erstellt", ["org_name" => $org->name]);
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public function setOrganizationKeys(): void
-	{
-		$this->checkPostArguments(["secret_keys"]);
-		foreach ($_POST["secret_keys"] as $secret_key) {
-			$secret_key = SecretKey::fromObj($secret_key);
-			DataRepo::insert($secret_key);
-		}
 	}
 
 	/**
@@ -171,13 +251,13 @@ class OrganizationController extends AdminController
 	public function deleteOrganization(int $id, bool $respond = true): bool
 	{
 		$member = DataRepo::of(Member::class)->getByField("org_id", $id);
-		array_map(fn ($entry) => DataRepo::delete($entry), $member);
+		array_map(fn($entry) => DataRepo::delete($entry), $member);
 
 		$secret_keys = DataRepo::of(SecretKey::class)->getByField("org_id", $id);
-		array_map(fn ($entry) => DataRepo::delete($entry), $secret_keys);
+		array_map(fn($entry) => DataRepo::delete($entry), $secret_keys);
 
 		$passwords = DataRepo::of(Password::class)->getByField("org_id", $id);
-		array_map(fn ($entry) => DataRepo::delete($entry), $passwords);
+		array_map(fn($entry) => DataRepo::delete($entry), $passwords);
 
 		$org = $this->_getOrganization($id);
 		if (!DataRepo::delete($org)) {

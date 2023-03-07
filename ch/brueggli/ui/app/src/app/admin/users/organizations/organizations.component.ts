@@ -89,28 +89,28 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
     let org_id = Number(this.contextMenu.nativeElement.dataset["id"]);
     this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/key").then(async response => {
       if (response.status === "success") {
-        let encrypted = response.data.secret_key;
-        let secret_key = await CryptUtils.decryptSecretKey(encrypted, this.shared.user.private_key as CryptoKey);
+        let secret_key_entry = response.data;
+        let secret_key = await CryptUtils.decryptSecretKey(secret_key_entry.secret_key, this.shared.user.private_key as CryptoKey);
 
         this.request("GET", this.API_HOST + "/admin/user/" + this.user.user_id + "/key").then(async response => {
           if (response.status === "success") {
             let public_key = await CryptUtils.getPublicKey(response.data.public_key);
-            let encrypted = await CryptUtils.encryptSecretKey(secret_key, public_key);
+            let encrypted_key = await CryptUtils.encryptSecretKey(secret_key, public_key);
 
             let secret_key_entry = {
-              secret_key: encrypted,
+              secret_key: encrypted_key,
               user_id: this.user.user_id,
               org_id: org_id,
             } as SecretKey;
 
-            this.request("PATCH", this.API_HOST + "/admin/organization/key", JSON.stringify({secret_key: secret_key_entry})).then(response => {
+            this.request("POST", this.API_HOST + "/admin/organization/key", JSON.stringify({secret_key: secret_key_entry})).then(response => {
               if (response.status === "success") {
                 let member_entry = {
                   user_id: this.user.user_id,
                   org_id: org_id,
                 } as Member;
 
-                this.request("PATCH", this.API_HOST + "/admin/organization/member", JSON.stringify({member: member_entry})).then(response => {
+                this.request("POST", this.API_HOST + "/admin/organization/member", JSON.stringify({member: member_entry})).then(response => {
                   if (response.status === "success") {
                     this.userOrganizations.push(member_entry);
                   }

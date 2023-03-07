@@ -129,6 +129,35 @@ class DataRepo
 		return ["data" => array_map(fn($row) => $this->class::fromObj($row), $result), ...$count];
 	}
 
+	// TODO: Comment
+	public function getByFieldPaged(int $page, string $field, mixed $value): array|null
+	{
+		$sql = $this->baseFetchSql() . " AND " . $field . " = :" . $field;
+		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql . static::$page_limit);
+
+		$offset = static::$page_count * $page;
+		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
+		$stmt->bindParam($field, $value);
+
+		try {
+			$stmt->execute();
+			$result = $stmt->fetchAll();
+		} catch (PDOException $e) {
+			throw new PDOException("Error getting data: " . $e->getMessage());
+		}
+
+		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($this->getCount());
+
+		try {
+			$stmt->execute();
+			$count = $stmt->fetch();
+		} catch (PDOException $e) {
+			throw new PDOException("Error getting count: " . $e->getMessage());
+		}
+
+		return ["data" => array_map(fn($row) => $this->class::fromObj($row), $result), ...$count];
+	}
+
 	/**
 	 * Gets all entries in a table that matches a search term paged by a certain number.
 	 * This function uses the LIKE clause to match entries that contain the search term.

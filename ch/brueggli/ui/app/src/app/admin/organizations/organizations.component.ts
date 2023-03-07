@@ -106,7 +106,7 @@ export class OrganizationsComponent extends AdminComponent {
             if (response.status === "success") {
               let secret_keys = await CryptUtils.generateSecretKeys(response.data, org_id);
 
-              this.request("PATCH", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
+              this.request("POST", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
             }
           });
 

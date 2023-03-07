@@ -2,6 +2,11 @@
 
 namespace controller;
 
+use lib\DataRepo\DataRepo;
+
+use model\Member;
+use model\SecretKey;
+
 class AdminController extends IOController
 {
 	/**
@@ -16,4 +21,23 @@ class AdminController extends IOController
 			$this->sendResponse("error", null, "Sie dürfen keine Aktion auf diesen Benutzer tätigen", null, 400);
 		}
 	}
+
+	// TODO: Comment
+	protected function checkSafeAllowance(int $id): void
+	{
+		$member = DataRepo::of(Member::class)->getByFields([
+			"user_id" => $_SESSION["user_id"],
+			"org_id" => $id
+		]);
+
+		$secret_key = DataRepo::of(SecretKey::class)->getByFields([
+			"user_id" => $_SESSION["user_id"],
+			"org_id" => $id
+		]);
+
+		if (!count($member) && !count($secret_key)) {
+			$this->sendResponse("error", null, "Sie dürfen keine Aktion auf diesen Tresor tätigen", null, 400);
+		}
+	}
+
 }

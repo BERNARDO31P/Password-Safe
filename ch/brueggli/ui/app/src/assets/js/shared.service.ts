@@ -10,5 +10,5 @@ import {User} from "./model/User";
 })
 export class SharedService {
   user: User = {} as User;
-  page?: number;
+  page: number = 1;
 }

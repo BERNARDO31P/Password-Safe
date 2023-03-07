@@ -26,7 +26,7 @@ class UserController extends AdminController
 	 * @return void
 	 * @throws ReflectionException Siehe getArrayKeys()
 	 */
-	#[NoReturn] public function searchUsers(string $search): void
+	#[NoReturn] public function search(string $search): void
 	{
 		$page = intval($_GET["page"] ?? 1);
 		$users = DataRepo::of(User::class)->searchPaged($page - 1, $search);
@@ -81,6 +81,23 @@ class UserController extends AdminController
 
 		$this->writeLog("Auslesen von allen Administratoren");
 		$this->sendResponse("success", $admins);
+	}
+
+	// TODO: Comment
+	#[NoReturn] public function removeAdmin($id): void
+	{
+		$this->checkUserAllowance($id);
+
+		$secret_keys = DataRepo::of(SecretKey::class)->getByField("user_id", $id);
+		$member = DataRepo::of(Member::class)->getByField("user_id", $id);
+
+		foreach ($secret_keys as $secret_key) {
+			if (!array_search($secret_key->org_id, $member)) {
+				DataRepo::delete($secret_key);
+			}
+		}
+
+		$this->sendResponse("success");
 	}
 
 	/**
