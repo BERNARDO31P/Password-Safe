@@ -74,7 +74,7 @@ export class SafeOrganizationComponent extends SafeComponent {
   declare private modal: Modal;
 
   /**
-   * Lädt die benötigten Daten für die Darstellung der Organisation.
+   * Lädt die benötigten Daten für die Darstellung des Tresors.
    * Entschlüsselt die Daten mit dem Schlüssel vom Benutzer.
    * @param {function} callback Die Funktion, die aufgerufen wird, wenn die Daten vollständig geladen sind.
    */
@@ -129,6 +129,10 @@ export class SafeOrganizationComponent extends SafeComponent {
     }
   }
 
+  /**
+   * Führt eine Suche nach Passwörtern auf dem Server durch und speichert das Ergebnis in die Passwortliste.
+   * @param {Event} event Das Auslöser-Event.
+   */
   protected override search(event: Event) {
     super.search(event, this.API_HOST + "/safe/" + this.organization.org_id, (response) => {
       if (response.status === "success") {
@@ -226,6 +230,7 @@ export class SafeOrganizationComponent extends SafeComponent {
 
   /**
    * Überprüft, ob mindestens ein Steuerelement Fehler enthält.
+   * Dafür da, damit die Passwortrichtlinien nicht Pflichtig sind.
    * @param controls Ein Objekt mit Steuerelementen
    * @param allowed Erlaubte Fehler
    * @returns {boolean} Gibt zurück, ob mindestens ein Steuerelement Fehler enthält, die nicht zugelassen sind

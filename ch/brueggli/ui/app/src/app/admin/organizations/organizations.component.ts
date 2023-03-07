@@ -74,6 +74,7 @@ export class OrganizationsComponent extends AdminComponent {
     });
   }
 
+  // TODO: Comment
   protected add() {
     this.formGroup.reset();
     this.organization = {} as Organization;
@@ -81,6 +82,7 @@ export class OrganizationsComponent extends AdminComponent {
     this.modal.show();
   }
 
+  // TODO: Comment
   protected async save() {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
     if (id) {
@@ -116,6 +118,7 @@ export class OrganizationsComponent extends AdminComponent {
     }
   }
 
+  // TODO: Comment
   protected edit() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
     let index = this.organizations.data.findIndex(org => org.org_id === id);
@@ -125,6 +128,7 @@ export class OrganizationsComponent extends AdminComponent {
     this.modal.show();
   }
 
+  // TODO: Comment
   protected delete() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
     this.request("DELETE", this.API_HOST + "/admin/organization/" + id).then(response => {
@@ -132,5 +136,10 @@ export class OrganizationsComponent extends AdminComponent {
         this.loadData();
       }
     });
+  }
+
+  // TODO: Comment
+  protected renewOrganizationKeys() {
+
   }
 }

@@ -103,6 +103,8 @@ export class UsersComponent extends AdminComponent {
    *
    * Wenn der Benutzer kein Admin mehr ist, sendet die Funktion eine DELETE-Anfrage an den Server, um die verschlüsselten Organisationsschlüssel des Benutzers zu entfernen.
    * Generiert die Organisationsschlüssel neu, um Sicherheit zu gewähren.
+   *
+   * TODO: Check comment
    */
   protected save() {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
@@ -268,6 +270,8 @@ export class UsersComponent extends AdminComponent {
   /**
    * Erneuert die Schlüssel von allen Organisationen.
    * @returns {Promise<void>} - Ein Promise, welcher die asynchrone Handlung beendet.
+   *
+   * TODO: Check comment
    */
   protected async renewOrganizationsKeys(): Promise<void> {
     let organizationPage = 1;
