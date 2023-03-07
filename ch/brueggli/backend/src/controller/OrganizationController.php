@@ -36,8 +36,7 @@ class OrganizationController extends AdminController
 	}
 
 	/**
-	 * Setzt einen neuen symmetrischen Schlüssel für eine Organisation anhand ihrer ID.
-	 * @param int $id Die ID der Organisation.
+	 * Setzt einen neuen symmetrischen Schlüssel für eine Organisation
 	 * @return void
 	 * @throws Exception Siehe DataRepo
 	 */
@@ -52,15 +51,17 @@ class OrganizationController extends AdminController
 			"org_id" => $secret_key->org_id
 		]);
 
+		$org = $this->_getOrganization($secret_key->org_id);
 		if (!count($entries) && !DataRepo::insert($secret_key)) {
-			$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation mit der ID {org_id} ist ein Fehler aufgetreten", ["org_id" => $secret_key->org_id], 500);
+			$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
 		}
 		$this->sendResponse("success");
 	}
 
 	/**
-	 * TODO: Comment
-	 * @throws Exception
+	 * Setzt mehrere neue symmetrische Schlüssel für eine Organisation
+	 * @return void
+	 * @throws Exception Siehe DataRepo
 	 */
 	public function setOrganizationKeys(): void
 	{
@@ -68,13 +69,17 @@ class OrganizationController extends AdminController
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
-			DataRepo::insert($secret_key);
+			$org = $this->_getOrganization($secret_key->org_id);
+			if (!DataRepo::insert($secret_key)) {
+				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
+			}
 		}
 	}
 
 	/**
-	 * TODO: Comment
-	 * @throws Exception
+	 * Aktualisiert einen bestehenden symmetrischen Schlüssel für eine Organisation
+	 * @return void
+	 * @throws Exception Siehe DataRepo
 	 */
 	public function updateOrganizationKeys(): void
 	{
@@ -82,12 +87,20 @@ class OrganizationController extends AdminController
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
-			DataRepo::update($secret_key);
+			$org = $this->_getOrganization($secret_key->org_id);
+			if (!DataRepo::update($secret_key)) {
+				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
+			}
 		}
 	}
 
 
-	// TODO: Comment
+	/**
+	 * Gibt alle Mitglieder einer Organisation anhand ihrer ID zurück.
+	 * @param int $id Die Organisations-ID
+	 * @return void
+	 * @throws Exception Siehe DataRepo
+	 */
 	#[NoReturn] public function getOrganizationMembers(int $id): void
 	{
 		$page = intval($_GET["page"] ?? 1);

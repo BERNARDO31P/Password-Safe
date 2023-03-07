@@ -22,7 +22,11 @@ class AdminController extends IOController
 		}
 	}
 
-	// TODO: Comment
+	/**
+	 * Prüft, ob der Benutzer Berechtigung hat, diese Aktion im Tresor durchzuführen
+	 * @param int $id Die Tresor-ID
+	 * @return void
+	 */
 	protected function checkSafeAllowance(int $id): void
 	{
 		$member = DataRepo::of(Member::class)->getByFields([
