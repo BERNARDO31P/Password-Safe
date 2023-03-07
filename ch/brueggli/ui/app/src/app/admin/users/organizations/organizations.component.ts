@@ -14,7 +14,7 @@ import {SecretKey} from "src/assets/js/model/SecretKey";
 
 
 @Component({
-  selector: "app-organizations",
+  selector: "admin-users-organizations",
   templateUrl: "./organizations.component.html",
   styleUrls: ["./organizations.component.scss"]
 })

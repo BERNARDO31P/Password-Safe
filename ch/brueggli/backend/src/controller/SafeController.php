@@ -11,6 +11,9 @@ use lib\DataRepo\DataRepo;
 use model\Password;
 
 use trait\getter;
+use model\Member;
+use model\Organization;
+use model\SecretKey;
 
 class SafeController extends AdminController
 {
@@ -29,7 +32,6 @@ class SafeController extends AdminController
 			"page" => $page,
 			"org_name" => $org->name
 		]);
-
 
 		$this->sendResponse("success", $passwords);
 	}
@@ -51,5 +53,33 @@ class SafeController extends AdminController
 				DataRepo::update($password);
 			}
 		}
+	}
+
+	// TODO: Comment
+	#[NoReturn] public function getOrganizations()
+	{
+		$entries = DataRepo::of(Member::class)->getByField("user_id", $_SESSION["user_id"]);
+
+		$organizations = [];
+		foreach($entries as $entry) {
+			$organization = DataRepo::of(Organization::class)->getById($entry->org_id);
+			$organizations[] = $organization;
+		}
+
+		$this->sendResponse("success", $organizations);
+	}
+
+	// TODO: Comment
+	#[NoReturn] public function getSecretKey(int $id) {
+		$secret_keys = DataRepo::of(SecretKey::class)->getByFields([
+			"org_id" => $id,
+			"user_id" => $_SESSION["user_id"]
+		]);
+
+		if (!count($secret_keys)) {
+			$this->sendResponse("error", null, "Keine Daten gefunden", null, 400);
+		}
+
+		$this->sendResponse("success", $secret_keys[0]);
 	}
 }

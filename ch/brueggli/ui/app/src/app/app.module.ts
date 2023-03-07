@@ -19,6 +19,11 @@ import {AdminHomeComponent} from "./admin/home/home.component";
 import {UsersComponent} from "./admin/users/users.component";
 import {OrganizationsComponent} from "./admin/organizations/organizations.component";
 import {UserOrganizationsComponent} from "./admin/users/organizations/organizations.component";
+import {SafeComponent} from "./safe/safe.component";
+import {SafeHomeComponent} from "./safe/home/home.component";
+import {SafeOrganizationComponent} from "./safe/organization/organization.component";
+
+
 
 @NgModule({
   declarations: [
@@ -31,6 +36,10 @@ import {UserOrganizationsComponent} from "./admin/users/organizations/organizati
     UserOrganizationsComponent,
     AdminComponent,
     AdminHomeComponent,
+    SafeComponent,
+    SafeHomeComponent,
+    SafeOrganizationComponent,
+
     YesNoPipe,
   ],
   imports: [

@@ -9,9 +9,9 @@ import {User} from "src/assets/js/model/User";
 
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: "auth-login",
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.scss"]
 })
 export class LoginComponent extends AppComponent {
   formGroup = new FormGroup({

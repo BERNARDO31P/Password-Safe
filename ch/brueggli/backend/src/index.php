@@ -47,9 +47,15 @@ $router->mount("/auth", function () use ($router) {
 	$router->get("/logout", "AuthController@logout");
 });
 
-$router->mount("/safe/{id}", function () use ($router) {
+$router->mount("/safe", function () use ($router) {
+	$router->mount("/{id}", function () use ($router) {
+		$router->get("/key", "SafeController@getSecretKey");
+
 		$router->get("/", "SafeController@getData");
 		$router->patch("/", "SafeController@setData");
+	});
+
+	$router->get("/", "SafeController@getOrganizations");
 });
 
 $router->mount("/admin", function () use ($router) {

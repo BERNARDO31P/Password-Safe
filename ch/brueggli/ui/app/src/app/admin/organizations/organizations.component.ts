@@ -9,7 +9,7 @@ import {AdminComponent} from "src/app/admin/admin.component";
 import {Organization} from "src/assets/js/model/Organization";
 
 @Component({
-  selector: "app-organizations",
+  selector: "admin-organizations",
   templateUrl: "./organizations.component.html",
   styleUrls: ["./organizations.component.scss"]
 })

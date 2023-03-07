@@ -13,7 +13,7 @@ import {Password} from "src/assets/js/model/Password";
 import {Member} from "src/assets/js/model/Member";
 
 @Component({
-  selector: "app-users",
+  selector: "admin-users",
   templateUrl: "./users.component.html",
   styleUrls: ["./users.component.scss"]
 })
@@ -182,7 +182,7 @@ export class UsersComponent extends AdminComponent {
 
         let passwords = [];
         for (let password of response.data.data as Array<Password>) {
-          let decrypted = await CryptUtils.decryptData(password.data, secret_key_old);
+          let decrypted = await CryptUtils.decryptData(password.data as string, secret_key_old);
           password.data = await CryptUtils.encryptData(decrypted, secret_key);
 
           passwords.push(password);

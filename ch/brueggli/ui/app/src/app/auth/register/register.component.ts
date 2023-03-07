@@ -9,7 +9,7 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {User} from "src/assets/js/model/User";
 
 @Component({
-  selector: "app-register",
+  selector: "auth-register",
   templateUrl: "./register.component.html",
   styleUrls: ["./register.component.scss"]
 })

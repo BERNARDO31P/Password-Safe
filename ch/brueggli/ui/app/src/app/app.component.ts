@@ -1,6 +1,6 @@
-import {AfterViewInit, Component} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
-import {FormControl} from "@angular/forms";
+import {AbstractControl, FormControl, FormGroup} from "@angular/forms";
 import {Title} from "@angular/platform-browser";
 import Swal, {SweetAlertIcon} from "sweetalert2";
 
@@ -19,7 +19,7 @@ export type Response = {
 };
 
 @Component({
-  selector: "app-root",
+  selector: "app",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"]
 })
@@ -33,7 +33,7 @@ export class AppComponent implements AfterViewInit {
   title: string = "";
   Object = Object;
 
-  constructor(protected shared: SharedService, private titleService: Title, protected router: Router, protected route: ActivatedRoute) {
+  constructor(protected shared: SharedService, private titleService: Title, protected router: Router, protected route: ActivatedRoute, protected changeDetectorRef: ChangeDetectorRef) {
     if (this.shared.user.user_id === undefined) {
       let data = localStorage.getItem("user");
       if (data) {
@@ -146,7 +146,7 @@ export class AppComponent implements AfterViewInit {
    */
   protected checkFormControl(control: FormControl<string | null>, error?: string): boolean {
     if (control.dirty || control.touched) {
-      if (typeof error !== 'undefined') {
+      if (typeof error !== "undefined") {
         return control.hasError(error);
       }
       return control.invalid;
