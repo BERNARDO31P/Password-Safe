@@ -1,0 +1,107 @@
+<div *ngIf="organization">
+  <h4 class="d-inline">Passwörter: {{organization.name}}</h4>
+  <button class="btn float-end" (click)="add()">Hinzufügen</button>
+</div>
+<form>
+  <div class="mb-3">
+    <input (input)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
+  </div>
+</form>
+<ng-container *ngIf="hasData(passwords) === 0 else nodata">
+  <div class="overflow-auto h-table">
+    <table class="table">
+      <thead>
+      <tr>
+        <th class="text-nowrap">Name</th>
+        <th class="text-nowrap">Beschreibung</th>
+        <th class="text-nowrap">Konto</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr (contextmenu)="updateContext($event)" *ngFor="let password of passwords.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page}" [attr.data-id]="password.pass_id">
+          <td>{{password.name}}</td>
+          <td>{{password.description}}</td>
+          <td>{{getAccount(password.data)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="has-text-centered mt-2" *ngIf="passwords.data.length / PAGE_COUNT > 1">
+    <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}"></pagination-controls>
+  </div>
+</ng-container>
+
+<ng-template #nodata>
+  <ng-container *ngIf="hasData(passwords) === 2 else loading">
+    <span class="error">Leider wurden keine Daten gefunden!</span>
+  </ng-container>
+  <ng-template #loading>
+    <div class="spinner">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  </ng-template>
+</ng-template>
+<div id="contextmenu" #context>
+  <button class="btn" (click)="copyPassword()">Passwort kopieren</button>
+  <button class="btn" (click)="edit()">Bearbeiten</button>
+  <button class="btn" (click)="delete()">Löschen</button>
+</div>
+
+<div #modal class="modal" tabindex="-1" [attr.data-id]="password.pass_id">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Benutzerverwaltung</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formGroup" (ngSubmit)="save()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Brüggli vSphere Admin" formControlName="name" autocomplete="name">
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'required')"> wurde nicht ausgefüllt</span>
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'minlength')"> muss mindestens {{formGroup.controls.name.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
+          </div>
+          <div class="mb-2">
+            <label for="description" class="form-label">Beschreibung</label>
+            <input type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description">
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.description, 'maxlength')"> darf maximal {{formGroup.controls.description.getError('maxLength')['requiredLength']}} Zeichen lang sein</span>
+          </div>
+          <div formGroupName="data">
+            <div class="mb-2">
+              <label for="account" class="form-label">Benutzername/E-Mail</label>
+              <input type="text" class="form-control" id="account" placeholder="" formControlName="account" autocomplete="account">
+              <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.account, 'required')"> wurde nicht ausgefüllt</span>
+              <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.account, 'minlength')"> muss mindestens {{formGroup.controls.data.controls.account.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
+            </div>
+            <div class="mb-2">
+              <label for="password" class="form-label">Passwort</label>
+              <div class="d-flex">
+                <input type="password" class="form-control d-inline" id="password" placeholder="" formControlName="password" autocomplete="new-password">
+                <button type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+                <button type="button" class="btn" (click)="generatePassword()"><i class="bi bi-arrow-repeat"></i></button>
+              </div>
+              <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'required')"> wurde nicht ausgefüllt</span>
+              <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'minlength')"> muss mindestens {{formGroup.controls.data.controls.password.getError('minlength')['requiredLength']}}
+                Zeichen lang sein</span>
+              <span class="warning" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'password')"> entspricht nicht den Kennwortrichtlinien</span>
+            </div>
+            <div class="mb-2">
+              <label for="password_repeat" class="form-label">Passwort wiederholen</label>
+              <div class="d-flex">
+                <input type="password" class="form-control" id="password_repeat" placeholder="" formControlName="password_repeat" autocomplete="new-password">
+                <button type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+              </div>
+              <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password_repeat, 'required')"> wurde nicht ausgefüllt</span>
+              <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password_repeat, 'matching')"> passwörter stimmen nicht überein</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            <button type="submit" [disabled]="hasErrors(formGroup.controls.data.controls, 'password')" class="btn btn-primary">Speichern</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
