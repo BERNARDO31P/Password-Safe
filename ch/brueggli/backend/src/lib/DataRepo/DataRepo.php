@@ -129,7 +129,16 @@ class DataRepo
 		return ["data" => array_map(fn($row) => $this->class::fromObj($row), $result), ...$count];
 	}
 
-	// TODO: Comment
+	/**
+	 * Gets entries in a table by a certain field value paged.
+	 *
+	 * @param int $page The current page number.
+	 * @param string $field The field whose value is filtered.
+	 * @param mixed $value The value expected for the given field.
+	 * @return array|null An array containing each entry on success,
+	 *                    `null` otherwise.
+	 * @throws PDOException If the query fails.
+	 */
 	public function getByFieldPaged(int $page, string $field, mixed $value): array|null
 	{
 		$sql = $this->baseFetchSql() . " AND " . $field . " = :" . $field;
@@ -159,7 +168,7 @@ class DataRepo
 	}
 
 	/**
-	 * Gets all entries in a table that matches a search term paged by a certain number.
+	 * Gets entries in a table that matches a search term paged by a certain number.
 	 * This function uses the LIKE clause to match entries that contain the search term.
 	 * The $page parameter specifies the current page number, and the page count
 	 * is specified by the static $page_count property.
