@@ -9,10 +9,13 @@ use lib\DataRepo\DataRepo;
 
 use model\User;
 
+use trait\getter;
+
 use function util\removeArrayKeys;
 
 class AuthController extends IOController
 {
+	use getter;
 
 	public function __construct()
 	{
@@ -88,6 +91,33 @@ class AuthController extends IOController
 			"email" => $_POST["email"]
 		], 500);
 		$this->sendResponse("error", null, "Es ist ein Fehler aufgetreten", null, 500);
+	}
+
+	/**
+	 * Aktualisiert die Benutzerdaten des aktuell angemeldeten Benutzers.
+	 * Wenn das aktuelle Passwort ungültig ist, wird eine Fehlermeldung zurückgegeben.
+	 * Wenn die Aktualisierung erfolgreich ist, wird eine Erfolgsmeldung zurückgegeben und die Sitzung wird aktualisiert.
+	 * @return void
+	 * @throws Exception Siehe DataRepo
+	 */
+	#[NoReturn] public function updateAccount(): void
+	{
+		$this->checkPostArguments(["password", "password_old", "private_key", "salt"]);
+
+		$user = $this->_getUser($_SESSION["user_id"]);
+
+		if ($user->password !== $_POST["password_old"]) {
+			$this->sendResponse("error", null, "Das derzeitige Passwort ist ungültig", null, 401);
+		}
+
+		$user = User::fromObj(array_merge($user->toArray(), $_POST));
+		if (!DataRepo::update($user)) {
+			$this->sendResponse("error", null, "Beim Bearbeiten der Benutzerdaten ist ein Fehler aufgetreten", null, 500);
+		}
+
+		$_SESSION = $user->toArray();
+
+		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Die Benutzerdaten wurden angepasst");
 	}
 
 	/**

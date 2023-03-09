@@ -37,12 +37,9 @@ export class AppComponent implements AfterViewInit {
     if (this.shared.user.user_id === undefined) {
       let data = localStorage.getItem("user");
       if (data) {
-        let encrypted = JSON.parse(data);
-        this.shared.user = encrypted;
+        this.shared.user = JSON.parse(data);
 
-        CryptUtils.decryptUser(encrypted, encrypted["password"]).then(user => {
-          this.shared.user = user;
-        });
+        CryptUtils.decryptUser(this.shared.user);
       }
     }
   }

@@ -42,12 +42,12 @@ export class LoginComponent extends AppComponent {
 
     this.request("post", this.API_HOST + "/auth/login", JSON.stringify(formData)).then(async response => {
       if (response.status === "success") {
-        this.shared.user = structuredClone(response.data) as User;
+        this.shared.user = response.data;
         this.shared.user.password = this.formGroup.value.password!;
 
         localStorage.setItem("user", JSON.stringify(this.shared.user));
 
-        await CryptUtils.decryptUser(this.shared.user, this.formGroup.value.password!);
+        await CryptUtils.decryptUser(this.shared.user);
 
         this.router.navigateByUrl("/");
       }

@@ -69,7 +69,7 @@ export class OrganizationsComponent extends AdminComponent {
   protected loadData() {
     this.request("GET", this.API_HOST + "/admin/organizations", null, {page: this.shared.page}).then(response => {
       if (response.status === "success") {
-        this.organizations = structuredClone(response.data) as {data: Array<Organization>, count: number};
+        this.organizations = response.data;
       }
     });
   }

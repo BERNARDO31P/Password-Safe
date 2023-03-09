@@ -88,7 +88,7 @@ export class UsersComponent extends AdminComponent {
   protected loadData() {
     this.request("GET", this.API_HOST + "/admin/users", null, {page: this.shared.page}).then(response => {
       if (response.status === "success") {
-        this.users = structuredClone(response.data) as { data: Array<User>, count: number };
+        this.users = response.data;
       }
     });
   }

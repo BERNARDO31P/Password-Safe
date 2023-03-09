@@ -1,0 +1,21 @@
+<h2>Account</h2>
+<form [formGroup]="formGroup" (ngSubmit)="save()">
+  <div class="mb-3">
+    <label for="password_current" class="form-label">Derzeitiges Passwort</label>
+    <input type="password" class="form-control" id="password_current" placeholder="***********" formControlName="password_current" autocomplete="current-password">
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Passwort</label>
+    <input type="password" class="form-control" id="password" placeholder="***********" formControlName="password" autocomplete="new-password">
+    <span class="error" *ngIf="checkFormControl(formGroup.controls.password, 'required')"> wurde nicht ausgefüllt</span>
+    <span class="error" *ngIf="checkFormControl(formGroup.controls.password, 'minlength')"> muss mindestens {{formGroup.controls.password.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
+    <span class="error" *ngIf="checkFormControl(formGroup.controls.password, 'password')"> entspricht nicht den Kennwortrichtlinien</span>
+  </div>
+  <div class="mb-3">
+    <label for="password_repeat" class="form-label">Passwort wiederholen</label>
+    <input type="password" class="form-control" id="password_repeat" placeholder="***********" formControlName="password_repeat" autocomplete="new-password">
+    <span class="error" *ngIf="checkFormControl(formGroup.controls.password_repeat, 'required')"> wurde nicht ausgefüllt</span>
+    <span class="error" *ngIf="checkFormControl(formGroup.controls.password_repeat, 'matching')"> passwörter stimmen nicht überein</span>
+  </div>
+  <button type="submit" [disabled]="!formGroup.valid" class="btn btn-primary">Speichern</button>
+</form>

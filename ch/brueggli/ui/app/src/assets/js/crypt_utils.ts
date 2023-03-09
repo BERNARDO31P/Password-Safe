@@ -82,13 +82,12 @@ export class CryptUtils {
    * Entschlüsselt den privaten und öffentlichen Schlüssel eines Benutzers mithilfe des gegebenen Passworts.
    * Gibt den Benutzer mit entschlüsselten Daten zurück.
    * @param {User} user Der Benutzer, dessen Schlüssel entschlüsselt werden sollen.
-   * @param {string} password Das Passwort, mit dem der geheime Schlüssel des Benutzers entschlüsselt werden soll.
    * @return {Promise<User>} Der Benutzer mit entschlüsselten Schlüsseln.
    */
-  static async decryptUser(user: User, password: string): Promise<User> {
+  static async decryptUser(user: User): Promise<User> {
     user.salt = this.base64ToArray(user.salt as string);
 
-    let secret_key = await this.passwordToSecretKey(password, user.salt);
+    let secret_key = await this.passwordToSecretKey(user.password, user.salt);
 
     user.private_key = await this.decryptPrivateKey(secret_key, user.private_key as string);
     user.public_key = await this.getPublicKey(user.public_key as string);

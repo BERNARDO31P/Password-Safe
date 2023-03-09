@@ -63,7 +63,7 @@ class OrganizationController extends AdminController
 	 * @return void
 	 * @throws Exception Siehe DataRepo
 	 */
-	public function setOrganizationKeys(): void
+	#[NoReturn] public function setOrganizationKeys(): void
 	{
 		$this->checkPostArguments(["secret_keys"]);
 
@@ -74,6 +74,7 @@ class OrganizationController extends AdminController
 				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
 			}
 		}
+		$this->sendResponse("success");
 	}
 
 	/**

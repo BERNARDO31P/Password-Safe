@@ -1,10 +1,11 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
+import {NgModule} from "@angular/core";
+import {RouterModule, Routes} from "@angular/router";
 
 import {HomeComponent} from "./home/home.component";
 
 import {RegisterComponent} from "./auth/register/register.component";
 import {LoginComponent} from "./auth/login/login.component";
+import {AccountComponent} from "./auth/account/account.component";
 
 import {AdminComponent} from "./admin/admin.component";
 import {AdminHomeComponent} from "./admin/home/home.component";
@@ -34,6 +35,7 @@ const routes: Routes = [
       [
         {component: LoginComponent, path: "login"},
         {component: RegisterComponent, path: "register"},
+        {component: AccountComponent, path: "account", canActivate: [LoginGuard]}
       ]
   },
   {

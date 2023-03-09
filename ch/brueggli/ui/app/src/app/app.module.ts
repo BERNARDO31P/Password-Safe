@@ -13,29 +13,37 @@ import {HomeComponent} from "./home/home.component";
 
 import {LoginComponent} from "./auth/login/login.component";
 import {RegisterComponent} from "./auth/register/register.component";
+import {AccountComponent} from "./auth/account/account.component";
 
 import {AdminComponent} from "./admin/admin.component";
 import {AdminHomeComponent} from "./admin/home/home.component";
 import {UsersComponent} from "./admin/users/users.component";
-import {OrganizationsComponent} from "./admin/organizations/organizations.component";
 import {UserOrganizationsComponent} from "./admin/users/organizations/organizations.component";
+
+import {OrganizationsComponent} from "./admin/organizations/organizations.component";
+
 import {SafeComponent} from "./safe/safe.component";
 import {SafeHomeComponent} from "./safe/home/home.component";
 import {SafeOrganizationComponent} from "./safe/organization/organization.component";
-
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
+
     LoginComponent,
     RegisterComponent,
+    AccountComponent,
+
     UsersComponent,
-    OrganizationsComponent,
     UserOrganizationsComponent,
+
+    OrganizationsComponent,
+
     AdminComponent,
     AdminHomeComponent,
+
     SafeComponent,
     SafeHomeComponent,
     SafeOrganizationComponent,

@@ -71,16 +71,14 @@ export class RegisterComponent extends AppComponent {
     formData["public_key"] = CryptUtils.arrayToBase64(publicKey);
     formData["salt"] = CryptUtils.arrayToBase64(salt);
 
-    this.request("post", this.API_HOST + "/auth/register", JSON.stringify(formData)).then(response => {
+    this.request("post", this.API_HOST + "/auth/register", JSON.stringify(formData)).then(async response => {
       if (response.status == "success") {
-        this.shared.user = structuredClone(response.data) as User;
+        this.shared.user = response.data;
         this.shared.user.password = this.formGroup.value.password!;
 
         localStorage.setItem("user", JSON.stringify(this.shared.user));
 
-        this.shared.user.private_key = keyPair.privateKey;
-        this.shared.user.public_key = keyPair.publicKey;
-        this.shared.user.salt = salt;
+        await CryptUtils.decryptUser(this.shared.user);
 
         this.router.navigateByUrl("/");
       }

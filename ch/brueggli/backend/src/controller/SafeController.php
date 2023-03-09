@@ -131,15 +131,15 @@ class SafeController extends AdminController
 
 	// TODO: Comment
 	#[NoReturn] public function getSecretKey(int $id) {
-		$secret_keys = DataRepo::of(SecretKey::class)->getByFields([
+		$secret_key = DataRepo::of(SecretKey::class)->getByFields([
 			"org_id" => $id,
 			"user_id" => $_SESSION["user_id"]
 		]);
 
-		if (!count($secret_keys)) {
+		if (!count($secret_key)) {
 			$this->sendResponse("error", null, "Keine Daten gefunden", null, 400);
 		}
 
-		$this->sendResponse("success", $secret_keys[0]);
+		$this->sendResponse("success", $secret_key[0]);
 	}
 }
