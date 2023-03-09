@@ -51,6 +51,10 @@ td {
   cursor: default;
 }
 
+[class*="pagination-"] {
+  display: inline-flex !important;
+}
+
 #sidebar-open {
   transition: 0.2s;
   position: fixed;
@@ -155,4 +159,8 @@ td {
   &:disabled {
     color: rgba(0, 0, 0, 0.3);
   }
+}
+
+.ngx-pagination {
+  padding-left: 0;
 }

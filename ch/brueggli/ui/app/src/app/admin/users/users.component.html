@@ -25,7 +25,7 @@
       </tbody>
     </table>
   </div>
-  <div class="has-text-centered mt-2" *ngIf="users.count! / PAGE_COUNT > 1">
+  <div class="text-center mt-2" *ngIf="users.count! / PAGE_COUNT > 1">
     <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}"></pagination-controls>
   </div>
 </ng-container>

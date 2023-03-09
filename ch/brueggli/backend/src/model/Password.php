@@ -16,7 +16,7 @@ class Password implements JsonSerializable
 	public const PRIMARY_KEY = "pass_id";
 
 	#[db_column]
-	public ?int $secret_id = null;
+	public ?int $pass_id = null;
 	#[db_column]
 	public string $name = "";
 	#[db_column]

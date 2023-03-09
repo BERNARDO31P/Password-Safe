@@ -18,7 +18,7 @@
       </tr>
       </thead>
       <tbody>
-        <tr (contextmenu)="updateContext($event)" *ngFor="let password of passwords.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page}" [attr.data-id]="password.pass_id">
+        <tr (contextmenu)="updateContext($event)" *ngFor="let password of passwords.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: passwords.count}" [attr.data-id]="password.pass_id">
           <td>{{password.name}}</td>
           <td>{{password.description}}</td>
           <td>{{getAccount(password.data)}}</td>
@@ -26,7 +26,7 @@
       </tbody>
     </table>
   </div>
-  <div class="has-text-centered mt-2" *ngIf="passwords.data.length / PAGE_COUNT > 1">
+  <div class="text-center mt-2" *ngIf="passwords.count! / PAGE_COUNT > 1">
     <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}"></pagination-controls>
   </div>
 </ng-container>

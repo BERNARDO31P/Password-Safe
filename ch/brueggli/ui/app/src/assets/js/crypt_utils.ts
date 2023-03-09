@@ -1,5 +1,6 @@
 import {User} from "./model/User";
 import {SecretKey} from "./model/SecretKey";
+import {Credentials} from "./model/Credentials";
 
 export class CryptUtils {
   /**
@@ -169,15 +170,15 @@ export class CryptUtils {
    * @param {CryptoKey} secretKey Der Schlüssel, der zum Entschlüsseln der Daten verwendet werden soll.
    * @return {Promise<string>} Die entschlüsselten Daten als Zeichenfolge.
    */
-  static async decryptData(base64Data: string, secretKey: CryptoKey): Promise<string> {
-    if (!base64Data) return base64Data;
+  static async decryptData(base64Data: string, secretKey: CryptoKey): Promise<Credentials> {
+    if (!base64Data) return {} as Credentials;
 
-    const encrypted = this.base64ToArray(base64Data);
-    let split = this.splitArrayBuffer(encrypted, 16);
+    const split = this.splitArrayBuffer(this.base64ToArray(base64Data), 16);
 
     const decrypted = await crypto.subtle.decrypt({name: "AES-GCM", iv: split[0], length: 256, tagLength: 128}, secretKey, split[1]);
+    const decoded = new TextDecoder().decode(decrypted);
 
-    return new TextDecoder().decode(decrypted);
+    return JSON.parse(decoded);
   }
 
   /**
@@ -187,9 +188,11 @@ export class CryptUtils {
    * @param {CryptoKey} secretKey Der Schlüssel, der zum Verschlüsseln der Daten verwendet werden soll.
    * @return {Promise<string>} Die verschlüsselten Daten als Base64-kodierte Zeichenfolge.
    */
-  static async encryptData(data: string, secretKey: CryptoKey): Promise<string> {
+  static async encryptData(data: Credentials, secretKey: CryptoKey): Promise<string> {
     const iv = crypto.getRandomValues(new Uint8Array(16));
-    const encoded = new TextEncoder().encode(data);
+
+    const json = JSON.stringify(data);
+    const encoded = new TextEncoder().encode(json);
     const encrypted = await crypto.subtle.encrypt({name: "AES-GCM", iv: iv, length: 256, tagLength: 128}, secretKey, encoded);
 
     return this.arrayToBase64(this.concatenateArrayBuffers(iv, encrypted));

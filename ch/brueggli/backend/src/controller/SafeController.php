@@ -19,8 +19,13 @@ class SafeController extends AdminController
 {
 	use getter;
 
+	// TODO: Implement and comment
+	public function search(int $id, string $search): void
+	{
+	}
+
 	// TODO: Comment
-	#[NoReturn] public function getData(int $id): void
+	#[NoReturn] public function getPasswords(int $id): void
 	{
 		$this->checkSafeAllowance($id);
 
@@ -40,7 +45,7 @@ class SafeController extends AdminController
 	 * // TODO: Comment
 	 * @throws Exception
 	 */
-	public function setData()
+	public function setPasswords(): void
 	{
 		$this->checkPostArguments(["passwords"]);
 
@@ -53,6 +58,51 @@ class SafeController extends AdminController
 				DataRepo::update($password);
 			}
 		}
+	}
+
+	/**
+	 * TODO: Comment
+	 * @throws Exception
+	 */
+	#[NoReturn] public function addPassword(): void
+	{
+		$this->checkPostArguments(["name", "org_id"]);
+
+		$password = Password::fromObj($_POST);
+
+		if (!DataRepo::insert($password)) {
+			// TODO: Error
+		}
+		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich hinzugefügt");
+	}
+
+	/**
+	 * TODO: Comment
+	 * @throws Exception
+	 */
+	#[NoReturn] public function updatePassword(): void
+	{
+		$this->checkPostArguments(["name", "org_id", "pass_id"]);
+
+		$password = Password::fromObj($_POST);
+
+		if (!DataRepo::update($password)) {
+			// TODO: Error
+		}
+		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich aktualisiert");
+	}
+
+	// TODO: Comment
+	public function deletePassword()
+	{
+		$this->checkPostArguments(["org_id", "pass_id"]);
+
+		$password = Password::fromObj($_POST);
+
+		if (!DataRepo::delete($password)) {
+			// TODO: Error
+		}
+		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich gelöscht");
 	}
 
 	// TODO: Comment

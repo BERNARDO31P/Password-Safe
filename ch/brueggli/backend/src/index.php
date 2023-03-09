@@ -48,11 +48,16 @@ $router->mount("/auth", function () use ($router) {
 });
 
 $router->mount("/safe", function () use ($router) {
+	$router->post("/", "SafeController@addPassword");
+	$router->patch("/", "SafeController@updatePassword");
+	$router->delete("/", "SafeController@deletePassword");
+
 	$router->mount("/{id}", function () use ($router) {
 		$router->get("/key", "SafeController@getSecretKey");
+		$router->get("/{search}", "SafeController@search");
 
-		$router->get("/", "SafeController@getData");
-		$router->patch("/", "SafeController@setData");
+		$router->get("/", "SafeController@getPasswords");
+		$router->patch("/", "SafeController@setPasswords");
 	});
 
 	$router->get("/", "SafeController@getOrganizations");

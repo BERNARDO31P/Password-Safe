@@ -11,6 +11,7 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {Password} from "src/assets/js/model/Password";
 import {Organization} from "src/assets/js/model/Organization";
 import {Credentials} from "src/assets/js/model/Credentials";
+import {User} from "../../../assets/js/model/User";
 
 
 @Component({
@@ -84,7 +85,7 @@ export class SafeOrganizationComponent extends SafeComponent {
     let index = this.shared.organizations.findIndex(org => org.org_id === id);
 
     if (index !== -1) {
-      this.request("GET", this.API_HOST + "/safe/" + id).then(response => {
+      this.request("GET", this.API_HOST + "/safe/" + id, null, {page: this.shared.page}).then(response => {
         if (response.status === "success") {
           this.passwords = response.data;
           this.organization = this.shared.organizations[index];
@@ -117,11 +118,9 @@ export class SafeOrganizationComponent extends SafeComponent {
    */
   override ngAfterViewInit() {
     super.ngAfterViewInit(() => {
-      this.loadData(() => {
-        this.route.params.subscribe(params => {
-          if (typeof params["id"] !== undefined) this.loadData();
-        });
-      })
+      this.route.params.subscribe(params => {
+        if (typeof params["id"] !== undefined) this.loadData();
+      });
     }, true);
 
     if (this.modalRef !== undefined) {
@@ -134,7 +133,7 @@ export class SafeOrganizationComponent extends SafeComponent {
    * @param {Event} event Das Auslöser-Event.
    */
   protected override search(event: Event) {
-    super.search(event, this.API_HOST + "/safe/" + this.organization.org_id, (response) => {
+    super.search(event, this.API_HOST + "/safe/" + this.organization.org_id + "/", (response) => {
       if (response.status === "success") {
         this.passwords = response.data;
       }
@@ -153,14 +152,63 @@ export class SafeOrganizationComponent extends SafeComponent {
 
   // TODO: Comment
   protected edit() {
+    let id = Number(this.contextMenu.nativeElement.dataset["id"]);
+    let index = this.passwords.data.findIndex(password => password.pass_id === id);
+    this.password = this.passwords.data[index];
+
+    this.formGroup.patchValue(this.password as any);
+    this.changeDetectorRef.detectChanges();
+
+    this.modal.show();
   }
 
   // TODO: Comment
   protected delete() {
+    let id = Number(this.contextMenu.nativeElement.dataset["id"]);
+    let index = this.passwords.data.findIndex(password => password.pass_id === id);
+    let password = this.passwords.data[index];
+
+    this.request("DELETE", this.API_HOST + "/safe", JSON.stringify(password)).then(async response => {
+      if (response.status === "success") {
+        this.loadData();
+      }
+    });
   }
 
   // TODO: Comment
-  protected save() {
+  protected async save() {
+    let org_id = Number(this.route.snapshot.params["id"]);
+    let id = Number(this.modalRef.nativeElement.dataset["id"]);
+
+    let password = structuredClone(this.formGroup.value) as Password;
+    password.org_id = org_id;
+    password.pass_id = id;
+
+    let encrypted = structuredClone(password);
+    encrypted.data = await CryptUtils.encryptData(password.data as Credentials, this.secret_key);
+
+    if (password.pass_id) {
+      this.request("PATCH", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
+        if (response.status === "success") {
+          this.password = password;
+
+          let index = this.passwords.data.findIndex(password => password.pass_id === id);
+          this.passwords.data[index] = password;
+
+          this.modal.hide();
+        }
+      });
+    } else {
+      this.request("POST", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
+        if (response.status === "success") {
+          this.password = password;
+          this.passwords.data.push(password);
+
+          this.modal.hide();
+        }
+      });
+      // TODO: Create
+    }
   }
 
   /**
