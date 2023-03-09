@@ -67,7 +67,9 @@ class SafeController extends AdminController
 			$this->checkSafeAllowance($org_id);
 
 			foreach ($_POST["passwords"] as $password) {
-				DataRepo::update($password);
+				if (!DataRepo::update($password)) {
+					$this->sendResponse("error", null, "Beim Aktualisieren der Passwörter ist ein Fehler aufgetreten", null, 500);
+				}
 			}
 		}
 	}
@@ -84,7 +86,7 @@ class SafeController extends AdminController
 		$password = Password::fromObj($_POST);
 
 		if (!DataRepo::insert($password)) {
-			// TODO: Error
+			$this->sendResponse("error", null, "Beim Hinzufügen des Passworts ist ein Fehler aufgetreten", null, 500);
 		}
 		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich hinzugefügt");
 	}
@@ -101,7 +103,7 @@ class SafeController extends AdminController
 		$password = Password::fromObj($_POST);
 
 		if (!DataRepo::update($password)) {
-			// TODO: Error
+			$this->sendResponse("error", null, "Beim Aktualisieren des Passworts ist ein Fehler aufgetreten", null, 500);
 		}
 		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich aktualisiert");
 	}
@@ -115,7 +117,7 @@ class SafeController extends AdminController
 		$password = Password::fromObj($_POST);
 
 		if (!DataRepo::delete($password)) {
-			// TODO: Error
+			$this->sendResponse("error", null, "Beim Entfernen des Passworts ist ein Fehler aufgetreten", null, 500);
 		}
 		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich gelöscht");
 	}
@@ -126,7 +128,7 @@ class SafeController extends AdminController
 		$entries = DataRepo::of(Member::class)->getByField("user_id", $_SESSION["user_id"]);
 
 		$organizations = [];
-		foreach($entries as $entry) {
+		foreach ($entries as $entry) {
 			$organization = DataRepo::of(Organization::class)->getById($entry->org_id);
 			$organizations[] = $organization;
 		}
@@ -135,7 +137,8 @@ class SafeController extends AdminController
 	}
 
 	// TODO: Comment
-	#[NoReturn] public function getSecretKey(int $id) {
+	#[NoReturn] public function getSecretKey(int $id)
+	{
 		$this->checkSafeAllowance($id);
 
 		$secret_key = DataRepo::of(SecretKey::class)->getByFields([
@@ -144,7 +147,13 @@ class SafeController extends AdminController
 		]);
 
 		if (!count($secret_key)) {
-			$this->sendResponse("error", null, "Keine Daten gefunden", null, 400);
+			$members = DataRepo::of(Member::class)->getByFields([
+				"org_id" => $id,
+				"user_id" => $_SESSION["user_id"]
+			]);
+			if (count($members)) DataRepo::delete($members[0]);
+
+			$this->sendResponse("error", null, "Sie besitzen keinen Schlüssel für diese Organisation", null, 401);
 		}
 
 		$this->sendResponse("success", $secret_key[0]);

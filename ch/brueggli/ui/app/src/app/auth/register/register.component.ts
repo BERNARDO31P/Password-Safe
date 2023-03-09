@@ -6,8 +6,6 @@ import {AppComponent} from "src/app/app.component";
 import {CustomValidators} from "src/assets/js/validators";
 import {CryptUtils} from "src/assets/js/crypt_utils";
 
-import {User} from "src/assets/js/model/User";
-
 @Component({
   selector: "auth-register",
   templateUrl: "./register.component.html",

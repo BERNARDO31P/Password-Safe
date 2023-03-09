@@ -3,10 +3,10 @@ import {Title} from "@angular/platform-browser";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Location} from "@angular/common";
 
+import {OrganizationsComponent} from "src/app/admin/organizations/organizations.component";
+
 import {SharedService} from "src/assets/js/shared.service";
 import {CryptUtils} from "src/assets/js/crypt_utils";
-
-import {OrganizationsComponent} from "src/app/admin/organizations/organizations.component";
 
 import {User} from "src/assets/js/model/User";
 import {Member} from "src/assets/js/model/Member";

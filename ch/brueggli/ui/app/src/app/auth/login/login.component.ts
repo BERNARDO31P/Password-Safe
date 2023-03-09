@@ -1,11 +1,9 @@
 import { Component} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 
-import {CryptUtils} from "src/assets/js/crypt_utils";
-
 import {AppComponent} from "src/app/app.component";
 
-import {User} from "src/assets/js/model/User";
+import {CryptUtils} from "src/assets/js/crypt_utils";
 
 
 @Component({

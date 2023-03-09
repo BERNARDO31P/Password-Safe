@@ -174,7 +174,7 @@ class OrganizationController extends AdminController
 		]);
 
 		if (!count($secret_key)) {
-			$this->sendResponse("error", null, "Keine Daten gefunden", null, 400);
+			$this->sendResponse("error", null, "Sie können diese Aktion nicht durchführen", null, 403);
 		}
 
 		$org = $this->_getOrganization($id);

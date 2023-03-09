@@ -84,8 +84,13 @@ class UserController extends AdminController
 		$this->sendResponse("success", $admins);
 	}
 
-	// TODO: Comment
-	#[NoReturn] public function removeAdmin($id): void
+	/**
+	 * Entfernt die Administratorrechte eines Benutzers, indem der symmetrische Schlüssel des Benutzers in allen Organisationen entfernt wird.
+	 * Sollte der Benutzer Mitglied einer Organisation sein, wird diese übersprungen.
+	 * @param int $id Die ID des Benutzers.
+	 * @return void
+	 */
+	#[NoReturn] public function removeAdmin(int $id): void
 	{
 		$this->checkUserAllowance($id);
 
@@ -94,7 +99,13 @@ class UserController extends AdminController
 
 		foreach ($secret_keys as $secret_key) {
 			if (!array_search($secret_key->org_id, $member)) {
-				DataRepo::delete($secret_key);
+				if (!DataRepo::delete($secret_key)) {
+					$user = $this->_getUser($secret_key->user_id);
+					$this->sendResponse("error", null, "Beim Entfernen des Administrators {user_first_name} {user_last_name} ist ein Fehler aufgetreten", [
+						"user_first_name" => $user->first_name,
+						"user_last_name" => $user->last_name
+					], 500);
+				}
 			}
 		}
 
@@ -149,16 +160,16 @@ class UserController extends AdminController
 		$user = User::fromObj($_POST);
 		$user->user_id = $id;
 
-		if (DataRepo::update($user)) {
-			$this->sendResponse("success", null, "Der Benutzer {user_first_name} {user_last_name} wurde angepasst", [
+		if (!DataRepo::update($user)) {
+			$this->sendResponse("error", null, "Beim Bearbeiten vom Benutzer {user_first_name} {user_last_name} ist ein Fehler aufgetreten", [
 				"user_first_name" => $user->first_name,
 				"user_last_name" => $user->last_name,
-			]);
+			], 500);
 		}
-		$this->sendResponse("error", null, "Beim Bearbeiten vom Benutzer {user_first_name} {user_last_name} ist ein Fehler aufgetreten", [
+		$this->sendResponse("success", null, "Der Benutzer {user_first_name} {user_last_name} wurde angepasst", [
 			"user_first_name" => $user->first_name,
 			"user_last_name" => $user->last_name,
-		], 500);
+		]);
 	}
 
 	/**
@@ -179,15 +190,15 @@ class UserController extends AdminController
 		array_map(fn ($entry) => DataRepo::delete($entry), $secret_keys);
 
 		$user = $this->_getUser($id);
-		if (DataRepo::delete($user)) {
-			$this->sendResponse("success", null, "Der Benutzer {user_first_name} {user_last_name} wurde entfernt", [
+		if (!DataRepo::delete($user)) {
+			$this->sendResponse("error", null, "Beim Entfernen vom Benutzer {user_first_name} {user_last_name} ist ein Fehler aufgetreten", [
 				"user_first_name" => $user->first_name,
 				"user_last_name" => $user->last_name,
-			]);
+			], 500);
 		}
-		$this->sendResponse("error", null, "Beim Entfernen vom Benutzer {user_first_name} {user_last_name} ist ein Fehler aufgetreten", [
+		$this->sendResponse("success", null, "Der Benutzer {user_first_name} {user_last_name} wurde entfernt", [
 			"user_first_name" => $user->first_name,
 			"user_last_name" => $user->last_name,
-		], 500);
+		]);
 	}
 }

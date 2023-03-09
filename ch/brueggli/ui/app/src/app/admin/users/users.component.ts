@@ -2,9 +2,9 @@ import {Component, ElementRef, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import Modal from "bootstrap/js/dist/modal";
 
-import {CryptUtils} from "src/assets/js/crypt_utils";
-
 import {AdminComponent} from "src/app/admin/admin.component";
+
+import {CryptUtils} from "src/assets/js/crypt_utils";
 
 import {User} from "src/assets/js/model/User";
 import {SecretKey} from "src/assets/js/model/SecretKey";

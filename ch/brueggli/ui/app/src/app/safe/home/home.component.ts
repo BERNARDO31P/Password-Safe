@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
-import {SafeComponent} from "../safe.component";
+import {Component} from "@angular/core";
+
+import {SafeComponent} from "src/app/safe/safe.component";
 
 @Component({
   selector: "safe-home",

@@ -35,20 +35,20 @@ class AuthController extends IOController
 
 		$user = DataRepo::of(User::class)->getByField("email", $_POST["email"]);
 
-		if (count($user) && $user[0]->password == $_POST["password"]) {
-			if (boolval($user[0]->is_suspended) === true) {
-				$this->sendResponse("error", null, "Dieses Konto {email} ist gesperrt", ["email" => $_POST["email"]], 403);
-			}
-
-			$user[0]->last_login = time();
-
-			DataRepo::update($user[0]);
-			$_SESSION = $user[0]->toArray();
-
-			$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Erfolgreich angemeldet");
+		if (!count($user) || $user[0]->password != $_POST["password"]) {
+			$this->writeLog("Anmeldung für den Benutzer {email} fehlgeschlagen", ["email" => $_POST["email"]], 401);
+			$this->sendResponse("error", null, "E-Mail oder Passwort falsch", null, 401);
 		}
-		$this->writeLog("Anmeldung für den Benutzer {email} fehlgeschlagen", ["email" => $_POST["email"]], 401);
-		$this->sendResponse("error", null, "E-Mail oder Passwort falsch", null, 401);
+		if (boolval($user[0]->is_suspended) === true) {
+			$this->sendResponse("error", null, "Das Konto {email} ist gesperrt", ["email" => $_POST["email"]], 403);
+		}
+
+		$user[0]->last_login = time();
+
+		DataRepo::update($user[0]);
+		$_SESSION = $user[0]->toArray();
+
+		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Erfolgreich angemeldet");
 	}
 
 	/**
@@ -80,17 +80,17 @@ class AuthController extends IOController
 		}
 
 		$user = User::fromObj($_POST);
-		if (DataRepo::insert($user)) {
-			$_SESSION = $user->toArray();
-
-			$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Erfolgreich registriert");
+		if (!DataRepo::insert($user)) {
+			$this->writeLog("Bei der Registrierung vom Benutzer {first_name} {last_name} / {email} ist ein Fehler aufgetreten", [
+				"first_name" => $_POST["first_name"],
+				"last_name" => $_POST["last_name"],
+				"email" => $_POST["email"]
+			], 500);
+			$this->sendResponse("error", null, "Es ist ein Fehler aufgetreten", null, 500);
 		}
-		$this->writeLog("Bei der Registrierung vom Benutzer {first_name} {last_name} / {email} ist ein Fehler aufgetreten", [
-			"first_name" => $_POST["first_name"],
-			"last_name" => $_POST["last_name"],
-			"email" => $_POST["email"]
-		], 500);
-		$this->sendResponse("error", null, "Es ist ein Fehler aufgetreten", null, 500);
+		$_SESSION = $user->toArray();
+
+		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Erfolgreich registriert");
 	}
 
 	/**
@@ -141,6 +141,8 @@ class AuthController extends IOController
 	 */
 	public function checkAdmin(): void
 	{
+		$this->checkLogin();
+
 		if (isset($_SESSION) && boolval($_SESSION["is_admin"] ?? false) !== true) {
 			if (!isset($_SESSION["user_id"])) $this->logout(false);
 
