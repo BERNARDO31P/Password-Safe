@@ -20,8 +20,18 @@ class SafeController extends AdminController
 	use getter;
 
 	// TODO: Implement and comment
-	public function search(int $id, string $search): void
+	#[NoReturn] public function search(int $id, string $search): void
 	{
+		$page = intval($_GET["page"] ?? 1);
+		$passwords = DataRepo::of(Password::class)->searchPaged($page - 1, $search, ["org_id" => $id]);
+
+		$org = $this->_getOrganization($id);
+
+		$this->writeLog("Suchanfrage in Passwörter von der Organisation {org_name}: {search}", [
+			"search" => $search,
+			"org_name" => $org->name
+		]);
+		$this->sendResponse("success", $passwords);
 	}
 
 	// TODO: Comment

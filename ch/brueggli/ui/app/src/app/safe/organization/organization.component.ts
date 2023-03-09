@@ -11,7 +11,6 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {Password} from "src/assets/js/model/Password";
 import {Organization} from "src/assets/js/model/Organization";
 import {Credentials} from "src/assets/js/model/Credentials";
-import {User} from "../../../assets/js/model/User";
 
 
 @Component({
@@ -133,11 +132,13 @@ export class SafeOrganizationComponent extends SafeComponent {
    * @param {Event} event Das Auslöser-Event.
    */
   protected override search(event: Event) {
-    super.search(event, this.API_HOST + "/safe/" + this.organization.org_id + "/", (response) => {
-      if (response.status === "success") {
-        this.passwords = response.data;
-      }
-    });
+    if (this.organization) {
+      super.search(event, this.API_HOST + "/safe/" + this.organization.org_id + "/", (response) => {
+        if (response.status === "success") {
+          this.passwords = response.data;
+        }
+      });
+    }
   }
 
   /**

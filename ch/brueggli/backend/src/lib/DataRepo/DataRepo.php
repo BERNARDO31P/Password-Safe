@@ -178,19 +178,22 @@ class DataRepo
 	 * @return array An array containing each matching entry for the current page and the total count of matching entries.
 	 * @throws PDOException If the query fails.
 	 */
-	public function searchPaged(int $page, string $search): array
+	public function searchPaged(int $page, string $search, array $id = [1 => 1]): array
 	{
 		$mapFn = fn($key) => "LOWER(" . $key . ") LIKE :search";
 		$search = "%$search%";
 
-		$searchSQL = " AND " . implode(" OR ", array_map($mapFn, $this->class::getDbFields()));
+		$searchSQL = " AND " . implode(" OR ", array_map($mapFn, $this->class::getDbFields())) . " AND " . key($id) . " = :value";
 
 		$sql = $this->baseFetchSql() . $searchSQL . static::$page_limit;
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
 
 		$offset = static::$page_count * $page;
+		$value = current($id);
+
 		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
 		$stmt->bindParam("search", $search);
+		$stmt->bindParam("value", $value);
 
 		try {
 			$stmt->execute();
@@ -203,15 +206,18 @@ class DataRepo
 			return array();
 		}
 
-		$sql = $this->getCount() . $searchSQL;
+		$sql = $this->getCount() . $searchSQL . static::$page_limit;
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
 
+		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
 		$stmt->bindParam("search", $search);
+		$stmt->bindParam("value", $value);
 
 		try {
 			$stmt->execute();
 			$count = $stmt->fetch();
 		} catch (PDOException $e) {
+			error_log($e->getMessage());
 			throw new PDOException("Error getting count: " . $e->getMessage());
 		}
 

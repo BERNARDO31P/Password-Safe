@@ -15,6 +15,7 @@ use model\SecretKey;
 use trait\getter;
 
 use function util\getArrayKeys;
+use function util\removeArrayKeys;
 
 class UserController extends AdminController
 {
@@ -24,13 +25,13 @@ class UserController extends AdminController
 	 * Sucht Benutzer anhand des Suchstrings und gibt sie in paginierter Form zurück.
 	 * @param string $search Der Suchstring.
 	 * @return void
-	 * @throws ReflectionException Siehe getArrayKeys()
+	 * @throws ReflectionException Siehe removeArrayKeys()
 	 */
 	#[NoReturn] public function search(string $search): void
 	{
 		$page = intval($_GET["page"] ?? 1);
 		$users = DataRepo::of(User::class)->searchPaged($page - 1, $search);
-		$users["data"] = getArrayKeys($users["data"], ["user_id", "email", "first_name", "last_name", "is_admin", "is_suspended", "last_login"]);
+		$users["data"] = removeArrayKeys($users["data"], ["password"]);
 
 		$this->writeLog("Suchanfrage in Benutzer: {search}", ["search" => $search]);
 		$this->sendResponse("success", $users);
