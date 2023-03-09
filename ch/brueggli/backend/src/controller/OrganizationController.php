@@ -78,21 +78,34 @@ class OrganizationController extends AdminController
 	}
 
 	/**
-	 * Aktualisiert einen bestehenden symmetrischen Schlüssel für eine Organisation
+	 * Aktualisiert bestehende symmetrische Schlüssel für eine Organisation
 	 * @return void
 	 * @throws Exception Siehe DataRepo
 	 */
-	public function updateOrganizationKeys(): void
+	#[NoReturn] public function updateOrganizationKeys(): void
 	{
 		$this->checkPostArguments(["secret_keys"]);
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
+
+			$secret_key_old = DataRepo::of(SecretKey::class)->getByFields([
+				"user_id" => $secret_key->user_id,
+				"org_id" => $secret_key->org_id
+			]);
+
 			$org = $this->_getOrganization($secret_key->org_id);
+			if (!count($secret_key_old)) {
+				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
+			}
+
+			$secret_key->secret_id = $secret_key_old[0]->secret_id;
+
 			if (!DataRepo::update($secret_key)) {
 				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
 			}
 		}
+		$this->sendResponse("success");
 	}
 
 
@@ -107,7 +120,8 @@ class OrganizationController extends AdminController
 		$page = intval($_GET["page"] ?? 1);
 		$members = DataRepo::of(Member::class)->getByFieldPaged($page - 1, "org_id", $id);
 
-		//$this->writeLog("Suchanfrage in Mitglieder: {search}", ["search" => $search]);
+		$org = $this->_getOrganization($id);
+		$this->writeLog("Auslesen aller Mitglieder der Organisation {org_name}", ["org_name" => $org->name]);
 		$this->sendResponse("success", $members);
 	}
 
@@ -201,8 +215,12 @@ class OrganizationController extends AdminController
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
-			DataRepo::insert($secret_key);
+			if (!DataRepo::insert($secret_key)) {
+				$org = $this->_getOrganization($secret_key->org_id);
+				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
+			}
 		}
+		$this->sendResponse("success");
 	}
 
 	/**

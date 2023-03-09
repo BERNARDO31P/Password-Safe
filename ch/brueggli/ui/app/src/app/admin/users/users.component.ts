@@ -9,8 +9,6 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {User} from "src/assets/js/model/User";
 import {SecretKey} from "src/assets/js/model/SecretKey";
 import {Organization} from "src/assets/js/model/Organization";
-import {Password} from "src/assets/js/model/Password";
-import {Member} from "src/assets/js/model/Member";
 
 @Component({
   selector: "admin-users",
@@ -164,107 +162,31 @@ export class UsersComponent extends AdminComponent {
   }
 
   // TODO: Comment
-  private async updateOrganizationData(organization: Organization, secret_key: CryptoKey): Promise<void> {
-    return await new Promise(async (resolve, reject) => {
-      let response = await this.request("GET", this.API_HOST + "/admin/organization/" + organization.org_id + "/key");
-      if (response.status !== "success") reject();
+  protected async addOrganizationsKey(keyPage: number = 1): Promise<void> {
+    let response = await this.request("GET", this.API_HOST + "/admin/organizations/key", null, {page: keyPage});
+    if (response.status === "success") {
+      if (!response.data.data.length) return;
 
-      let secret_key_old = await CryptUtils.decryptSecretKey(response.data.secret_key, this.shared.user.private_key as CryptoKey);
+      keyPage++;
 
-      let passwordPage = 1;
-      let passwordInterval = setInterval(async () => {
-        response = await this.request("GET", this.API_HOST + "/safe/" + organization.org_id, null, {page: passwordPage});
-        if (response.status !== "success") reject();
-        if (!response.data.data.length) {
-          clearInterval(passwordInterval);
-          resolve();
-        }
+      let public_key = await CryptUtils.getPublicKey(this.user.public_key as string);
 
-        passwordPage++;
+      let secret_keys = [];
+      for (let secret_key_admin of response.data.data as Array<SecretKey>) {
+        let secret_key = await CryptUtils.decryptSecretKey(secret_key_admin.secret_key as string, this.shared.user.private_key as CryptoKey);
 
-        let passwords = [];
-        for (let password of response.data.data as Array<Password>) {
-          let decrypted = await CryptUtils.decryptData(password.data as string, secret_key_old);
-          password.data = await CryptUtils.encryptData(decrypted, secret_key);
+        let secret_key_user = {
+          user_id: this.user.user_id,
+          org_id: secret_key_admin.org_id,
+          secret_key: await CryptUtils.encryptSecretKey(secret_key, public_key)
+        } as SecretKey;
 
-          passwords.push(password);
-        }
+        secret_keys.push(secret_key_user);
+      }
 
-        response = await this.request("PATCH", this.API_HOST + "/safe/" + organization.org_id, JSON.stringify({passwords: passwords}));
-        if (response.status !== "success") reject();
-      }, 1000);
-    });
-  }
-
-  // TODO: Comment
-  private async updateOrganizationMembers(organization: Organization, secret_key: CryptoKey): Promise<void> {
-    return await new Promise(async (resolve, reject) => {
-      let memberPage = 1;
-      let memberInterval = setInterval(async () => {
-        let response = await this.request("GET", this.API_HOST + "/admin/organization/" + organization.org_id + "/members", null, {page: memberPage});
-        if (response.status !== "success") reject();
-        if (!response.data.data.length) {
-          clearInterval(memberInterval);
-          resolve();
-        }
-
-        memberPage++;
-
-        let secret_keys = [];
-        for (let member of response.data.data as Array<Member>) {
-          let response = await this.request("GET", this.API_HOST + "/admin/user/" + member.user_id + "/key");
-          if (response.status !== "success") reject();
-
-          let public_key = await CryptUtils.getPublicKey(response.data.public_key);
-
-          let secret_key_encrypted = {
-            user_id: member.user_id,
-            org_id: organization.org_id,
-            secret_key: await CryptUtils.encryptSecretKey(secret_key as CryptoKey, public_key)
-          } as SecretKey;
-
-          secret_keys.push(secret_key_encrypted);
-        }
-
-        this.request("PATCH", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
-      }, 1000);
-    });
-  }
-
-  // TODO: Comment
-  protected async addOrganizationsKey(): Promise<void> {
-    return await new Promise((resolve) => {
-      let keyPage = 1;
-      let keyInterval = setInterval(() => {
-        this.request("GET", this.API_HOST + "/admin/organizations/key", null, {page: keyPage}).then(async response => {
-          if (response.status === "success") {
-            if (!response.data.data.length) {
-              clearInterval(keyInterval);
-              resolve();
-            }
-
-            keyPage++;
-
-            let public_key = await CryptUtils.getPublicKey(this.user.public_key as string);
-
-            let secret_keys = [];
-            for (let secret_key_admin of response.data.data as Array<SecretKey>) {
-              let secret_key = await CryptUtils.decryptSecretKey(secret_key_admin.secret_key as string, this.shared.user.private_key as CryptoKey);
-
-              let secret_key_user = {
-                user_id: this.user.user_id,
-                org_id: secret_key_admin.org_id,
-                secret_key: await CryptUtils.encryptSecretKey(secret_key, public_key)
-              } as SecretKey;
-
-              secret_keys.push(secret_key_user);
-            }
-
-            this.request("POST", this.API_HOST + "/admin/organizations/key", JSON.stringify({secret_keys: secret_keys}));
-          }
-        });
-      }, 1000);
-    });
+      response = await this.request("POST", this.API_HOST + "/admin/organizations/key", JSON.stringify({secret_keys: secret_keys}));
+      if (response.status === "success") await this.addOrganizationsKey(keyPage);
+    }
   }
 
   /**
@@ -273,27 +195,20 @@ export class UsersComponent extends AdminComponent {
    *
    * TODO: Check comment
    */
-  protected async renewOrganizationsKeys(): Promise<void> {
-    let organizationPage = 1;
-    return new Promise((resolve) => {
-      let organizationInterval = setInterval(async () => {
-        let response = await this.request("GET", this.API_HOST + "/admin/organizations", null, {page: organizationPage})
-        if (response.status === "success") {
-          if (!response.data.data.length) {
-            clearInterval(organizationInterval);
-            resolve();
-          }
+  protected async renewOrganizationsKeys(organizationPage: number = 1): Promise<void> {
+    let response = await this.request("GET", this.API_HOST + "/admin/organizations", null, {page: organizationPage})
+    if (response.status === "success") {
+      if (!response.data.data.length) return
 
-          organizationPage++;
+      organizationPage++;
 
-          for (let organization of response.data.data as Array<Organization>) {
-            let secret_key = await CryptUtils.generateSecretKey();
-            await this.updateOrganizationData(organization, secret_key);
-            await this.updateOrganizationMembers(organization, secret_key);
-          }
-        }
-      }, 1000);
-    });
+      for (let organization of response.data.data as Array<Organization>) {
+        let secret_key = await CryptUtils.generateSecretKey();
+        await this.updateOrganizationData(organization, secret_key);
+        await this.updateOrganizationMembers(organization, secret_key);
+      }
+      await this.renewOrganizationsKeys(organizationPage);
+    }
   }
 
   /**

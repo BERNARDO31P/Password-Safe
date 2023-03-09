@@ -57,21 +57,20 @@ class SafeController extends AdminController
 	 * // TODO: Comment
 	 * @throws Exception
 	 */
-	public function setPasswords(): void
+	#[NoReturn] public function setPasswords(): void
 	{
 		$this->checkPostArguments(["passwords"]);
 
-		if (count($_POST["passwords"])) {
-			$org_id = $_POST["passwords"][0]->org_id;
+		foreach ($_POST["passwords"] as $password) {
+			$password = Password::fromObj($password);
 
-			$this->checkSafeAllowance($org_id);
+			$this->checkSafeAllowance($password->org_id);
 
-			foreach ($_POST["passwords"] as $password) {
-				if (!DataRepo::update($password)) {
-					$this->sendResponse("error", null, "Beim Aktualisieren der Passwörter ist ein Fehler aufgetreten", null, 500);
-				}
+			if (!DataRepo::update($password)) {
+				$this->sendResponse("error", null, "Beim Aktualisieren der Passwörter ist ein Fehler aufgetreten", null, 500);
 			}
 		}
+		$this->sendResponse("success");
 	}
 
 	/**
