@@ -22,6 +22,8 @@ class SafeController extends AdminController
 	// TODO: Implement and comment
 	#[NoReturn] public function search(int $id, string $search): void
 	{
+		$this->checkSafeAllowance($id);
+
 		$page = intval($_GET["page"] ?? 1);
 		$passwords = DataRepo::of(Password::class)->searchPaged($page - 1, $search, ["org_id" => $id]);
 
@@ -77,6 +79,7 @@ class SafeController extends AdminController
 	#[NoReturn] public function addPassword(): void
 	{
 		$this->checkPostArguments(["name", "org_id"]);
+		$this->checkSafeAllowance($_POST["org_id"]);
 
 		$password = Password::fromObj($_POST);
 
@@ -93,6 +96,7 @@ class SafeController extends AdminController
 	#[NoReturn] public function updatePassword(): void
 	{
 		$this->checkPostArguments(["name", "org_id", "pass_id"]);
+		$this->checkSafeAllowance($_POST["org_id"]);
 
 		$password = Password::fromObj($_POST);
 
@@ -103,9 +107,10 @@ class SafeController extends AdminController
 	}
 
 	// TODO: Comment
-	public function deletePassword()
+	#[NoReturn] public function deletePassword()
 	{
 		$this->checkPostArguments(["org_id", "pass_id"]);
+		$this->checkSafeAllowance($_POST["org_id"]);
 
 		$password = Password::fromObj($_POST);
 
@@ -131,6 +136,8 @@ class SafeController extends AdminController
 
 	// TODO: Comment
 	#[NoReturn] public function getSecretKey(int $id) {
+		$this->checkSafeAllowance($id);
+
 		$secret_key = DataRepo::of(SecretKey::class)->getByFields([
 			"org_id" => $id,
 			"user_id" => $_SESSION["user_id"]
