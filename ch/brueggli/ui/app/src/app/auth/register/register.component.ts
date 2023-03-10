@@ -53,20 +53,19 @@ export class RegisterComponent extends AppComponent {
    */
   async register() {
     let salt = crypto.getRandomValues(new Uint8Array(16));
-    let secretKey = await CryptUtils.passwordToSecretKey(this.formGroup.value.password!, salt);
+    let secret_key = await CryptUtils.passwordToSecretKey(this.formGroup.value.password!, salt);
+    let password = await CryptUtils.hashSecretKey(secret_key);
 
     let keyPair = await CryptUtils.generateKeyPair();
-
-    let privateKey = await CryptUtils.encryptPrivateKey(keyPair.privateKey, secretKey);
-    let publicKey = await crypto.subtle.exportKey("spki", keyPair.publicKey);
-    let hashedPassword = await CryptUtils.hashString(this.formGroup.value.password!);
+    let private_key = await CryptUtils.encryptPrivateKey(keyPair.privateKey, secret_key);
+    let public_key = await crypto.subtle.exportKey("spki", keyPair.publicKey);
 
     let formData = structuredClone(this.formGroup.value) as Record<string, any>;
     delete formData["password_repeat"];
 
-    formData["password"] = hashedPassword;
-    formData["private_key"] = privateKey;
-    formData["public_key"] = CryptUtils.arrayToBase64(publicKey);
+    formData["password"] = password;
+    formData["private_key"] = private_key;
+    formData["public_key"] = CryptUtils.arrayToBase64(public_key);
     formData["salt"] = CryptUtils.arrayToBase64(salt);
 
     this.request("post", this.API_HOST + "/auth/register", JSON.stringify(formData)).then(async response => {

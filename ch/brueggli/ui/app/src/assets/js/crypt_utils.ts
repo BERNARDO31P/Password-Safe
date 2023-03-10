@@ -5,12 +5,13 @@ import {Credentials} from "./model/Credentials";
 export class CryptUtils {
   /**
    * Berechnet den SHA-512-Hashwert der gegebenen Zeichenfolge.
-   * @param {string} string Die Zeichenfolge, deren Hashwert berechnet werden soll.
    * @return {Promise<string>} Der Hashwert der Zeichenfolge als Base64-kodierte Zeichenfolge.
+   * @param secretKey
+   * // TODO: Comment
    */
-  static async hashString(string: string): Promise<string> {
-    const encoded = new TextEncoder().encode(string);
-    const hash = await crypto.subtle.digest("SHA-512", encoded);
+  static async hashSecretKey(secretKey: CryptoKey): Promise<string> {
+    let key = await crypto.subtle.exportKey("raw", secretKey);
+    const hash = await crypto.subtle.digest("SHA-512", key);
     return this.arrayToBase64(hash);
   }
 

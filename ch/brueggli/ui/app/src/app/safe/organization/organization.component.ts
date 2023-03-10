@@ -134,9 +134,13 @@ export class SafeOrganizationComponent extends SafeComponent {
    */
   protected override search(event: Event) {
     if (this.organization) {
-      super.search(event, this.API_HOST + "/safe/" + this.organization.org_id + "/", (response) => {
+      super.search(event, this.API_HOST + "/safe/" + this.organization.org_id + "/", async (response) => {
         if (response.status === "success") {
           this.passwords = response.data;
+
+          for (let password of this.passwords.data) {
+            password.data = await CryptUtils.decryptData(password.data as string, this.secret_key);
+          }
         }
       });
     }

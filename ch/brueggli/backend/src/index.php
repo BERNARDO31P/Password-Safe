@@ -46,6 +46,8 @@ $router->mount("/auth", function () use ($router) {
 	$router->post("/register", "AuthController@register");
 	$router->get("/logout", "AuthController@logout");
 
+	$router->post("/salt", "AuthController@getSalt");
+
 	$router->patch("/account", "AuthController@updateAccount");
 });
 

@@ -120,6 +120,18 @@ class AuthController extends IOController
 		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Die Benutzerdaten wurden angepasst");
 	}
 
+	// TODO: Comment
+	#[NoReturn] public function getSalt()
+	{
+		$this->checkPostArguments(["email"]);
+
+		$user = DataRepo::of(User::class)->getByField("email", $_POST["email"]);
+		if (!count($user)) {
+			$this->sendResponse("error", null, "E-Mail oder Passwort falsch", null, 401);
+		}
+		$this->sendResponse("success", ["salt" => $user[0]->salt]);
+	}
+
 	/**
 	 * Beendet die aktuelle Sitzung und gibt eine Erfolgsmeldung zurück, wenn $respond auf true gesetzt ist.
 	 * @param bool $respond Gibt an, ob eine Erfolgsmeldung zurückgegeben werden soll.

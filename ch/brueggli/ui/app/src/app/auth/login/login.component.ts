@@ -34,20 +34,27 @@ export class LoginComponent extends AppComponent {
    * Wenn die Anmeldung erfolgreich ist, wird der Benutzer weitergeleitet.
    * Seine Daten werden entschlüsselt und lokal gespeichert.
    */
-  async login() {
-    let formData = structuredClone(this.formGroup.value) as Record<string, any>;
-    formData["password"] = await CryptUtils.hashString(this.formGroup.value.password!);
-
-    this.request("post", this.API_HOST + "/auth/login", JSON.stringify(formData)).then(async response => {
+  login() {
+    this.request("POST", this.API_HOST + "/auth/salt", JSON.stringify({email: this.formGroup.value.email})).then(async response => {
       if (response.status === "success") {
-        this.shared.user = response.data;
-        this.shared.user.password = this.formGroup.value.password!;
+        let salt = CryptUtils.base64ToArray(response.data.salt);
+        let secret_key = await CryptUtils.passwordToSecretKey(this.formGroup.value.password!, salt);
 
-        localStorage.setItem("user", JSON.stringify(this.shared.user));
+        let formData = structuredClone(this.formGroup.value) as Record<string, any>;
+        formData["password"] = await CryptUtils.hashSecretKey(secret_key);
 
-        await CryptUtils.decryptUser(this.shared.user);
+        this.request("POST", this.API_HOST + "/auth/login", JSON.stringify(formData)).then(async response => {
+          if (response.status === "success") {
+            this.shared.user = response.data;
+            this.shared.user.password = this.formGroup.value.password!;
 
-        this.router.navigateByUrl("/");
+            localStorage.setItem("user", JSON.stringify(this.shared.user));
+
+            await CryptUtils.decryptUser(this.shared.user);
+
+            this.router.navigateByUrl("/");
+          }
+        });
       }
     });
   }
