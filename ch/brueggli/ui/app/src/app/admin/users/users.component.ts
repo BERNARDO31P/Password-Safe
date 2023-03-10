@@ -96,13 +96,11 @@ export class UsersComponent extends AdminComponent {
    *
    * Sendet eine PATCH-Anfrage an den Server, um die vorgenommenen Änderungen am Benutzer zu speichern und aktualisiert die Benutzerliste auf der Seite.
    *
-   * Wenn der Benutzer zu einem Admin wird, ruft die Funktion die Liste aller Organisationen und deren geheime Schlüssel vom angemeldeten Benutzer ab.
-   * Verschlüsselt die Schlüssel mit dem öffentlichen Schlüssel des zu bearbeitenden Benutzers.
+   * Wenn der Benutzer zu einem Admin wird, wird für jede Organisation der symmetrische Schlüssel geholt.
+   * Diese werden für den Benutzer verschlüsselt und im System abgelegt.
    *
    * Wenn der Benutzer kein Admin mehr ist, sendet die Funktion eine DELETE-Anfrage an den Server, um die verschlüsselten Organisationsschlüssel des Benutzers zu entfernen.
    * Generiert die Organisationsschlüssel neu, um Sicherheit zu gewähren.
-   *
-   * TODO: Check comment
    */
   protected save() {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
@@ -132,8 +130,8 @@ export class UsersComponent extends AdminComponent {
 
   /**
    * Holt die Informationen des ausgewählten Benutzers.
-   * Fügt alle Informationen bekannten Informationen ein.
-   * Öffnet das Modal zum Bearbeiten des ausgewählten Benutzers.
+   * Fügt alle bekannten Informationen ein.
+   * Öffnet das Modal zum Bearbeiten der Informationen.
    */
   protected edit() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
@@ -161,7 +159,11 @@ export class UsersComponent extends AdminComponent {
     });
   }
 
-  // TODO: Comment
+  /**
+   * Holt für jede Organisation den symmetrischen Schlüssel für den angemeldeten Benutzer.
+   * Diese werden für den neuen Administrator verschlüsselt und im System abgelegt.
+   * @returns {Promise<void>} - Ein Promise, welcher die asynchrone Handlung beendet.
+   */
   protected async addOrganizationsKey(keyPage: number = 1): Promise<void> {
     let response = await this.request("GET", this.API_HOST + "/admin/organizations/key", null, {page: keyPage});
     if (response.status === "success") {
@@ -191,9 +193,8 @@ export class UsersComponent extends AdminComponent {
 
   /**
    * Erneuert die Schlüssel von allen Organisationen.
+   * Verschlüsselt die Daten mit dem neuen Schlüssel.
    * @returns {Promise<void>} - Ein Promise, welcher die asynchrone Handlung beendet.
-   *
-   * TODO: Check comment
    */
   protected async renewOrganizationsKeys(organizationPage: number = 1): Promise<void> {
     let response = await this.request("GET", this.API_HOST + "/admin/organizations", null, {page: organizationPage})

@@ -147,7 +147,7 @@ export class SafeOrganizationComponent extends SafeComponent {
   }
 
   /**
-   * Setzt das Formular auf die Standardwerte zurück und öffnet das Modal zum Hinzufügen eines neuen Passworts
+   * Setzt das Formular auf die Standardwerte zurück und öffnet das Modal zum Hinzufügen eines neuen Passworts.
    */
   protected add() {
     this.formGroup.reset();
@@ -156,7 +156,10 @@ export class SafeOrganizationComponent extends SafeComponent {
     this.modal.show();
   }
 
-  // TODO: Comment
+  /**
+   * Fügt alle bekannten Informationen des ausgewählten Passworts ein.
+   * Öffnet das Modal zum Bearbeiten der Informationen.
+   */
   protected edit() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
     let index = this.passwords.data.findIndex(password => password.pass_id === id);
@@ -168,7 +171,9 @@ export class SafeOrganizationComponent extends SafeComponent {
     this.modal.show();
   }
 
-  // TODO: Comment
+  /**
+   * Löscht das ausgewählte Passwort aus dem System.
+   */
   protected delete() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
     let index = this.passwords.data.findIndex(password => password.pass_id === id);
@@ -181,7 +186,11 @@ export class SafeOrganizationComponent extends SafeComponent {
     });
   }
 
-  // TODO: Comment
+  /**
+   * Speichert das Passwort im Tresor.
+   * Wenn die ID des Passworts bekannt ist, wird dieses angepasst.
+   * Sonst wird ein neues erstellt.
+   */
   protected async save() {
     let org_id = Number(this.route.snapshot.params["id"]);
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
@@ -213,7 +222,6 @@ export class SafeOrganizationComponent extends SafeComponent {
           this.modal.hide();
         }
       });
-      // TODO: Create
     }
   }
 
@@ -239,7 +247,7 @@ export class SafeOrganizationComponent extends SafeComponent {
   }
 
   /**
-   * Kopiert das Passwort des entsprechenden Eintrags in die Zwischenablage
+   * Kopiert das Passwort des entsprechenden Eintrags in die Zwischenablage.
    */
   protected copyPassword() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
@@ -255,7 +263,7 @@ export class SafeOrganizationComponent extends SafeComponent {
   }
 
   /**
-   * Generiert ein Passwort nach dem angegebenen Muster und setzt es in die beiden Formularfelder
+   * Generiert ein Passwort nach dem angegebenen Muster und setzt es in beide Formularfelder.
    */
   protected async generatePassword() {
     const password = new RandExp(CustomValidators.patternGenerate).gen();
@@ -302,7 +310,10 @@ export class SafeOrganizationComponent extends SafeComponent {
     return false;
   }
 
-  // TODO: Comment
+  /**
+   * Dafür da um die Anmeldedaten im Frontend korrekt anzuzeigen.
+   * Dies wird benötigt, da die Anmeldedaten verschlüsselt im "data" Objekt gespeichert werden.
+   */
   protected getAccount(data: any) {
     return data.account;
   }

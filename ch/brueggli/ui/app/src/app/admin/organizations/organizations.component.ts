@@ -75,7 +75,9 @@ export class OrganizationsComponent extends AdminComponent {
     });
   }
 
-  // TODO: Comment
+  /**
+   * Setzt das Formular auf die Standardwerte zurück und öffnet das Modal zum Hinzufügen einer neuen Organisation.
+   */
   protected add() {
     this.formGroup.reset();
     this.organization = {} as Organization;
@@ -83,8 +85,12 @@ export class OrganizationsComponent extends AdminComponent {
     this.modal.show();
   }
 
-  // TODO: Comment
-  protected async save() {
+  /**
+   * Speichert die Organisation im System.
+   * Wenn die ID der Organisation bekannt ist, wird diese angepasst.
+   * Sonst wird eine neue mit einem symmetrischen Schlüssel erstellt.
+   */
+  protected save() {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
     if (id) {
       this.request("PATCH", this.API_HOST + "/admin/organization/" + id, JSON.stringify(this.formGroup.value)).then(response => {
@@ -119,7 +125,10 @@ export class OrganizationsComponent extends AdminComponent {
     }
   }
 
-  // TODO: Comment
+  /**
+   * Fügt alle bekannten Informationen der ausgewählten Organisation ein.
+   * Öffnet das Modal zum Bearbeiten der Informationen.
+   */
   protected edit() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
     let index = this.organizations.data.findIndex(org => org.org_id === id);
@@ -129,7 +138,9 @@ export class OrganizationsComponent extends AdminComponent {
     this.modal.show();
   }
 
-  // TODO: Comment
+  /**
+   * Löscht die ausgewählte Organisation aus dem System.
+   */
   protected delete() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
     this.request("DELETE", this.API_HOST + "/admin/organization/" + id).then(response => {
@@ -139,7 +150,11 @@ export class OrganizationsComponent extends AdminComponent {
     });
   }
 
-  // TODO: Comment
+  /**
+   * Erneuert den symmetrischen Schlüssel der Organisation.
+   * Verschlüsselt die Daten mit dem neuen Schlüssel.
+   * Verschlüsselt den Schlüssel für die Mitglieder der Organisation.
+   */
   protected async renewOrganizationKeys() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
 

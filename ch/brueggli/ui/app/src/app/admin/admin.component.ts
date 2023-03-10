@@ -22,7 +22,14 @@ export class AdminComponent extends AppComponent {
     super(shared, titleService, router, route, changeDetectorRef);
   }
 
-  // TODO: Comment
+  /**
+   * Aktualisiert die Daten der Organisation mit dem neuen symmetrischen Schlüssel.
+   * @param {Organization} organization - Die Organisation, deren Daten aktualisiert werden sollen.
+   * @param {CryptoKey} secret_key - Der neue symmetrische Schlüssel.
+   * @param {CryptoKey} secret_key_old - Der alte symmetrische Schlüssel.
+   * @param {number} [passwordPage=1] - Die Seitennummer für die Passwortliste. Standardmäßig wird die Seite 1 verwendet.
+   * @returns {Promise<void>} - Ein Promise, das zurückgegeben wird, wenn die Aktualisierung der Daten abgeschlossen ist.
+   */
   private async updateData(organization: Organization, secret_key: CryptoKey, secret_key_old: CryptoKey, passwordPage: number = 1): Promise<void> {
     let response = await this.request("GET", this.API_HOST + "/safe/" + organization.org_id, null, {page: passwordPage});
     if (response.status !== "success" || !response.data.data.length) return;
@@ -41,6 +48,13 @@ export class AdminComponent extends AppComponent {
     if (response.status === "success") await this.updateData(organization, secret_key, secret_key_old, passwordPage);
   }
 
+  /**
+   * Aktualisiert die Schlüssel der Mitglieder für eine Organisation mit dem neuen symmetrischen Schlüssel.
+   * @param {Organization} organization - Die Organisation, deren Schlüssel aktualisiert werden sollen.
+   * @param {CryptoKey} secret_key - Der neue symmetrische Schlüssel.
+   * @param {number} [memberPage=1] - Die Seitennummer für die Mitgliederliste. Standardmäßig wird die Seite 1 verwendet.
+   * @returns {Promise<void>} - Ein Promise, das zurückgegeben wird, wenn die Aktualisierung der Mitglieder abgeschlossen ist.
+   */
   protected async updateOrganizationMembers(organization: Organization, secret_key: CryptoKey, memberPage: number = 1): Promise<void> {
     let response = await this.request("GET", this.API_HOST + "/admin/organization/" + organization.org_id + "/members", null, {page: memberPage});
     if (response.status !== "success" || !response.data.data.length) return;
@@ -70,7 +84,12 @@ export class AdminComponent extends AppComponent {
     if (response.status === "success") await this.updateOrganizationMembers(organization, secret_key, memberPage);
   }
 
-  // TODO: Comment
+  /**
+   * Aktualisiert die Daten der Organisation mit dem neuen symmetrischen Schlüssel und dem alten symmetrischen Schlüssel, der vom Server abgerufen wird.
+   * @param {Organization} organization - Die Organisation, deren Daten aktualisiert werden sollen.
+   * @param {CryptoKey} secret_key - Der neue symmetrische Schlüssel.
+   * @returns {Promise<void>} - Ein Promise, das zurückgegeben wird, wenn die Aktualisierung der Daten abgeschlossen ist.
+   */
   protected async updateOrganizationData(organization: Organization, secret_key: CryptoKey): Promise<void> {
       let response = await this.request("GET", this.API_HOST + "/admin/organization/" + organization.org_id + "/key");
       if (response.status !== "success") return;

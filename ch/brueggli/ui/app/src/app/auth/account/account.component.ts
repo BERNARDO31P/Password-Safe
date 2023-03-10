@@ -32,7 +32,7 @@ export class AccountComponent extends AppComponent {
   });
 
   /**
-   * Speichert das geänderte Benutzerkonto auf dem Server.
+   * Speichert die geänderten Anmeldedaten auf dem Server.
    * Generiert einen neuen symmetrischen Schlüssel auf Grundlage des neuen Passworts und verschlüsselt damit den privaten Schlüssel des Benutzers.
    * Speichert die aktualisierten Daten auf dem Server.
    */

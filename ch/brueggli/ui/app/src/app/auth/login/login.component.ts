@@ -30,7 +30,8 @@ export class LoginComponent extends AppComponent {
   }
 
   /**
-   * Führt einen Login-Vorgang mit den eingegebenen Benutzerdaten durch.
+   * Holt den Salt vom Benutzer und generiert das gehashte Passwort (symmetrische Schlüssel).
+   * Führt einen Login-Vorgang mit den Benutzerdaten durch.
    * Wenn die Anmeldung erfolgreich ist, wird der Benutzer weitergeleitet.
    * Seine Daten werden entschlüsselt und lokal gespeichert.
    */
