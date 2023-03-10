@@ -4,10 +4,9 @@ import {Credentials} from "./model/Credentials";
 
 export class CryptUtils {
   /**
-   * Berechnet den SHA-512-Hashwert der gegebenen Zeichenfolge.
-   * @return {Promise<string>} Der Hashwert der Zeichenfolge als Base64-kodierte Zeichenfolge.
-   * @param secretKey
-   * // TODO: Comment
+   * Berechnet den SHA-512-Hashwert von symmetrischen Schlüssel.
+   * @param {CryptoKey} secretKey Der Schlüssel welcher gehasht werden soll.
+   * @return {Promise<string>} Der Hashwert des Schlüssels als Base64-kodierte Zeichenfolge.
    */
   static async hashSecretKey(secretKey: CryptoKey): Promise<string> {
     let key = await crypto.subtle.exportKey("raw", secretKey);
@@ -17,9 +16,9 @@ export class CryptUtils {
 
   /**
    * Fügt zwei ArrayBuffer zusammen und gibt das Ergebnis zurück.
-   * @param {ArrayBuffer} buffer1 Der erste ArrayBuffer
-   * @param {ArrayBuffer} buffer2 Der zweite ArrayBuffer
-   * @return {ArrayBuffer} Ein neuer ArrayBuffer, der die beiden Argument-Buffer enthält
+   * @param {ArrayBuffer} buffer1 Der erste ArrayBuffer.
+   * @param {ArrayBuffer} buffer2 Der zweite ArrayBuffer.
+   * @return {ArrayBuffer} Ein neuer ArrayBuffer, der die beiden Argument-Buffer enthält.
    */
   private static concatenateArrayBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer): ArrayBuffer {
     const combined = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
@@ -31,9 +30,9 @@ export class CryptUtils {
   /**
    * Teilt den ArrayBuffer am angegebenen Index und gibt die beiden resultierenden Buffer als Tuple zurück.
    * Wenn der Split-Index größer als die Größe des Buffers ist, wird eine Fehlermeldung zurückgegeben.
-   * @param {ArrayBuffer} buffer Der ArrayBuffer, der geteilt werden soll
-   * @param {number} splitIndex Der Index, an dem der ArrayBuffer geteilt werden soll
-   * @return {[ArrayBuffer, ArrayBuffer]} Ein Tupel, das die beiden resultierenden Buffer enthält
+   * @param {ArrayBuffer} buffer Der ArrayBuffer, der geteilt werden soll.
+   * @param {number} splitIndex Der Index, an dem der ArrayBuffer geteilt werden soll.
+   * @return {[ArrayBuffer, ArrayBuffer]} Ein Tupel, das die beiden resultierenden Buffer enthält.
    */
   private static splitArrayBuffer(buffer: ArrayBuffer, splitIndex: number): [ArrayBuffer, ArrayBuffer] {
     if (splitIndex > buffer.byteLength) {
