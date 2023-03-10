@@ -120,8 +120,12 @@ class AuthController extends IOController
 		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Die Benutzerdaten wurden angepasst");
 	}
 
-	// TODO: Comment
-	#[NoReturn] public function getSalt()
+	/**
+	 * Gibt das Salz eines Benutzers anhand der E-Mail-Adresse zurück.
+	 * @return void
+	 * @throws Exception Wenn kein Benutzer mit der angegebenen E-Mail-Adresse gefunden wurde.
+	 */
+	#[NoReturn] public function getSalt(): void
 	{
 		$this->checkPostArguments(["email"]);
 

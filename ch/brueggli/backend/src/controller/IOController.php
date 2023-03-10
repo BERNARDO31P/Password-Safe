@@ -17,7 +17,6 @@ class IOController
 
 	/**
 	 * Konstruktor der Klasse. Initialisiert einen Logger, um Log-Einträge in eine Datei zu schreiben.
-	 *
 	 * @param string $channel Der Name des Logger-Kanals. Standardmäßig "default".
 	 * @return void
 	 */
@@ -38,7 +37,6 @@ class IOController
 	/**
 	 * Überprüft, ob alle erforderlichen POST-Argumente vorhanden sind und ob diese leer sind.
 	 * Wenn ein Argument fehlt oder leer ist, wird eine Fehlermeldung zurückgegeben.
-	 *
 	 * @param array $args Ein Array mit allen erforderlichen Argumenten.
 	 * @return void
 	 */
@@ -66,7 +64,6 @@ class IOController
 
 	/**
 	 * Gibt ein Level-Objekt auf Basis des angegebenen HTTP-Statuscodes zurück.
-	 *
 	 * @param int $code Der HTTP-Statuscode.
 	 * @return Level Das Level-Objekt, das zum angegebenen Statuscode gehört.
 	 */
@@ -85,7 +82,6 @@ class IOController
 
 	/**
 	 * Sendet eine HTTP-Antwort als JSON-Objekt und schreibt den entsprechenden Log-Eintrag.
-	 *
 	 * @param string $status Der Status der Antwort ("success" oder "error").
 	 * @param array|object|null $data Ein assoziatives Array oder Objekt, das die Daten enthält, die in der Antwort zurückgegeben werden sollen.
 	 * @param string $message Eine Nachricht, die in der Antwort zurückgegeben werden soll.
@@ -118,7 +114,6 @@ class IOController
 	/**
 	 * Schreibt eine Log-Nachricht mit dem angegebenen Code und der Nachricht in das Log-File.
 	 * Die optionale Context-Variable ermöglicht es Platzhalter in der Nachricht durch den tatsächlichen Wert zu ersetzen.
-	 *
 	 * @param string $message Die Nachricht, die geschrieben werden soll
 	 * @param array|null $context Ein optionales assoziatives Array mit Schlüssel-Wert-Paaren, die als Platzhalter in der Nachricht dienen sollen
 	 * @param int $code Der Code der Log-Nachricht, um den Schweregrad der Nachricht anzugeben
@@ -137,7 +132,6 @@ class IOController
 
 	/**
 	 * Gibt eine Fehlermeldung zurück, dass die angeforderte Ressource nicht gefunden wurde.
-	 *
 	 * @return void
 	 */
 	#[NoReturn] public function show404(): void
@@ -149,7 +143,6 @@ class IOController
 
 	/**
 	 * Gibt eine Erfolgsmeldung zurück, dass der Dienst einsatzbereit ist.
-	 *
 	 * @return void
 	 */
 	#[NoReturn] public function health(): void

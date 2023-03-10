@@ -19,7 +19,12 @@ class SafeController extends AdminController
 {
 	use getter;
 
-	// TODO: Implement and comment
+	/**
+	 * Sucht nach Passwörtern innerhalb einer Organisation.
+	 * @param int $id - Die ID der Organisation, in der nach Passwörtern gesucht werden soll.
+	 * @param string $search - Der Suchbegriff für die Passwortsuche.
+	 * @return void
+	 */
 	#[NoReturn] public function search(int $id, string $search): void
 	{
 		$this->checkSafeAllowance($id);
@@ -36,7 +41,11 @@ class SafeController extends AdminController
 		$this->sendResponse("success", $passwords);
 	}
 
-	// TODO: Comment
+	/**
+	 * Ruft die Passwörter einer Organisation ab.
+	 * @param int $id - Die ID der Organisation, deren Passwörter abgerufen werden sollen.
+	 * @return void
+	 */
 	#[NoReturn] public function getPasswords(int $id): void
 	{
 		$this->checkSafeAllowance($id);
@@ -54,8 +63,9 @@ class SafeController extends AdminController
 	}
 
 	/**
-	 * // TODO: Comment
-	 * @throws Exception
+	 * Aktualisiert die Passwörter von Organisationen.
+	 * @return void
+	 * @throws Exception Siehe DataRepo.
 	 */
 	#[NoReturn] public function setPasswords(): void
 	{
@@ -74,8 +84,9 @@ class SafeController extends AdminController
 	}
 
 	/**
-	 * TODO: Comment
-	 * @throws Exception
+	 * Fügt ein neues Passwort hinzu.
+	 * @return void
+	 * @throws Exception Siehe DataRepo.
 	 */
 	#[NoReturn] public function addPassword(): void
 	{
@@ -91,8 +102,9 @@ class SafeController extends AdminController
 	}
 
 	/**
-	 * TODO: Comment
-	 * @throws Exception
+	 * Aktualisiert ein bestehendes Passwort.
+	 * @return void
+	 * @throws Exception Siehe DataRepo.
 	 */
 	#[NoReturn] public function updatePassword(): void
 	{
@@ -107,8 +119,12 @@ class SafeController extends AdminController
 		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich aktualisiert");
 	}
 
-	// TODO: Comment
-	#[NoReturn] public function deletePassword()
+	/**
+	 * Entfernt ein Passwort aus der Datenbank.
+	 * @return void
+	 * @throws Exception Siehe DataRepo.
+	 */
+	#[NoReturn] public function deletePassword(): void
 	{
 		$this->checkPostArguments(["org_id", "pass_id"]);
 		$this->checkSafeAllowance($_POST["org_id"]);
@@ -121,8 +137,15 @@ class SafeController extends AdminController
 		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich gelöscht");
 	}
 
-	// TODO: Comment
-	#[NoReturn] public function getOrganizations()
+	/**
+	 * Lädt alle Organisationen eines Benutzers und sendet diese zurück.
+	 *
+	 * Ruft die Member-Einträge für den Benutzer aus der Datenbank ab und lädt dann für jeden Member-Eintrag die dazugehörige Organisation.
+	 * Die Informationen der Organisationen werden in einem Array gespeichert und an den Client gesendet.
+	 * @return void
+	 * @throws Exception Siehe DataRepo.
+	 */
+	#[NoReturn] public function getOrganizations(): void
 	{
 		$entries = DataRepo::of(Member::class)->getByField("user_id", $_SESSION["user_id"]);
 
@@ -135,8 +158,14 @@ class SafeController extends AdminController
 		$this->sendResponse("success", $organizations);
 	}
 
-	// TODO: Comment
-	#[NoReturn] public function getSecretKey(int $id)
+	/**
+	 * Gibt den verschlüsselten symmetrischen Schlüssel für die angegebene Organisation und den aktuellen Benutzer zurück.
+	 * Überprüft zunächst, ob der Benutzer die Berechtigung hat, den Schlüssel abzurufen, indem es sicherstellt, dass der Benutzer ein Mitglied der Organisation ist.
+	 * Wenn der Benutzer keinen Schlüssel besitzt, wird eine DELETE-Anforderung an den Server gesendet, um den Benutzer aus der Organisation zu entfernen.
+	 * @param int $id Die ID der Organisation, für die der Schlüssel abgerufen werden soll.
+	 * @throws Exception Siehe DataRepo.
+	 */
+	#[NoReturn] public function getSecretKey(int $id): void
 	{
 		$this->checkSafeAllowance($id);
 

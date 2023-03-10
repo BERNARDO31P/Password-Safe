@@ -196,7 +196,10 @@ class OrganizationController extends AdminController
 		$this->sendResponse("success", $secret_key[0]);
 	}
 
-	// TODO: Comment
+	/**
+	 * Gibt die symmetrischen Schlüssel des Benutzers für alle Organisationen zurück.
+	 * @return void
+	 */
 	#[NoReturn] public function getOrganizationsKey(): void
 	{
 		$page = intval($_GET["page"] ?? 1);
@@ -206,10 +209,12 @@ class OrganizationController extends AdminController
 	}
 
 	/**
-	 * // TODO: Comment
-	 * @throws Exception
+	 *
+	 * Speichert die symmetrischen Schlüssel des Benutzers für Organisationen.
+	 * @throws Exception Wenn beim Speichern eines symmetrischen Schlüssels ein Fehler auftritt.
+	 * @return void
 	 */
-	public function setOrganizationsKey(): void
+	#[NoReturn] public function setOrganizationsKey(): void
 	{
 		$this->checkPostArguments(["secret_keys"]);
 
