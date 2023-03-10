@@ -165,12 +165,7 @@ export class UsersComponent extends AdminComponent {
               await this.renewOrganizationsKeys();
             } else {
               for (let member of userMember) {
-                response = await this.request("GET", this.API_HOST + "/admin/organization/" + member.org_id);
-
-                if (response.status === "success") {
-                  let organization = response.data;
-                  await this.renewOrganizationKeys(organization);
-                }
+                await this.renewOrganizationKeys(member.org_id);
               }
             }
             this.loadData();
