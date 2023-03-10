@@ -7,7 +7,6 @@ import {AdminComponent} from "src/app/admin/admin.component";
 import {CryptUtils} from "src/assets/js/crypt_utils";
 
 import {Organization} from "src/assets/js/model/Organization";
-import {Member} from "src/assets/js/model/Member";
 
 @Component({
   selector: "admin-organizations",
@@ -155,15 +154,12 @@ export class OrganizationsComponent extends AdminComponent {
    * Verschlüsselt die Daten mit dem neuen Schlüssel.
    * Verschlüsselt den Schlüssel für die Mitglieder der Organisation.
    */
-  protected async renewOrganizationKeys() {
+  protected async renewKeys() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
-
-    let index = this.organizations.data.findIndex(org => org.org_id === id);
-    this.organization = this.organizations.data[index];
 
     let secret_key = await CryptUtils.generateSecretKey();
 
-    await this.updateOrganizationData(this.organization, secret_key);
-    await this.updateOrganizationMembers(this.organization, secret_key);
+    await this.updateOrganizationData(id, secret_key);
+    await this.updateOrganizationMembers(id, secret_key);
   }
 }

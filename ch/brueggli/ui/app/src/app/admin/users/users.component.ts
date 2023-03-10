@@ -147,14 +147,35 @@ export class UsersComponent extends AdminComponent {
 
   /**
    * Löscht den ausgewählten Benutzer aus dem System.
+   * Falls der Benutzer ein Administrator war, werden die Schlüssel von allen Organisationen erneuert.
+   * Sonst nur von jeden Organisationen, in welchen der Benutzer Mitglied war.
    */
   protected delete() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
 
-    this.request("DELETE", this.API_HOST + "/admin/user/" + id).then(async response => {
+    this.request("GET", this.API_HOST + "/admin/user/" + id + "/organizations").then(response => {
       if (response.status === "success") {
-        await this.renewOrganizationsKeys();
-        this.loadData();
+        let index = this.users.data.findIndex((user) => user.user_id === id);
+        let user = this.users.data[index];
+        let userMember = response.data;
+
+        this.request("DELETE", this.API_HOST + "/admin/user/" + id).then(async response => {
+          if (response.status === "success") {
+            if (user.is_admin) {
+              await this.renewOrganizationsKeys();
+            } else {
+              for (let member of userMember) {
+                response = await this.request("GET", this.API_HOST + "/admin/organization/" + member.org_id);
+
+                if (response.status === "success") {
+                  let organization = response.data;
+                  await this.renewOrganizationKeys(organization);
+                }
+              }
+            }
+            this.loadData();
+          }
+        });
       }
     });
   }
@@ -205,8 +226,8 @@ export class UsersComponent extends AdminComponent {
 
       for (let organization of response.data.data as Array<Organization>) {
         let secret_key = await CryptUtils.generateSecretKey();
-        await this.updateOrganizationData(organization, secret_key);
-        await this.updateOrganizationMembers(organization, secret_key);
+        await this.updateOrganizationData(organization.org_id!, secret_key);
+        await this.updateOrganizationMembers(organization.org_id!, secret_key);
       }
       await this.renewOrganizationsKeys(organizationPage);
     }

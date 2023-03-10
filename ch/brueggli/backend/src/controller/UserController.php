@@ -98,7 +98,7 @@ class UserController extends AdminController
 		$member = DataRepo::of(Member::class)->getByField("user_id", $id);
 
 		foreach ($secret_keys as $secret_key) {
-			if (!array_search($secret_key->org_id, $member)) {
+			if (!in_array($secret_key->org_id, array_column($member, "org_id"))) {
 				if (!DataRepo::delete($secret_key)) {
 					$user = $this->_getUser($secret_key->user_id);
 					$this->sendResponse("error", null, "Beim Entfernen des Administrators {user_first_name} {user_last_name} ist ein Fehler aufgetreten", [

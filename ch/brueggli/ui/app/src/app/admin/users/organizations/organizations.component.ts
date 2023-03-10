@@ -124,10 +124,8 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
   }
 
   /**
-   * Holt den öffentlichen Schlüssel der Organisation, welcher für den angemeldeten Benutzer bestimmt ist und entschlüsselt diesen.
-   * Holt den öffentlichen Schlüssel des Benutzers.
-   * Verschlüsselt den öffentlichen Schlüssel der Organisation mit dem Schlüssel des Benutzers.
-   * Sendet die verschlüsselten Daten an den Server.
+   * Entfernt den Benutzer von der Organisation.
+   * Falls der Benutzer kein Administrator ist, werden die Schlüssel erneuert.
    */
   protected remove() {
     let org_id = Number(this.contextMenu.nativeElement.dataset["id"]);
@@ -136,12 +134,14 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
       org_id: org_id
     } as Member;
 
-    this.request("DELETE", this.API_HOST + "/admin/organization/member", JSON.stringify({member: member_entry})).then(response => {
+    this.request("DELETE", this.API_HOST + "/admin/organization/member", JSON.stringify({member: member_entry})).then(async response => {
       if (response.status === "success") {
         let member_index = this.userOrganizations.findIndex(member => member.org_id === org_id);
         this.userOrganizations.splice(member_index, 1);
 
-        //if (!this.user.is_admin) this.renewOrganizationKeys();
+        if (!this.user.is_admin) {
+          await this.renewOrganizationKeys(org_id);
+        }
       }
     });
   }
