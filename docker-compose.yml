@@ -38,7 +38,7 @@ services:
     volumes:
       - ./config/mariadb/script:/docker-entrypoint-initdb.d
       - ./config/mariadb/my.cnf:/etc/mysql/my.cnf
-      - ./data:/root/data
+      - ./data:/var/lib/mysql
 
 networks:
   intern:
