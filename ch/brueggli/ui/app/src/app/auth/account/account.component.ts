@@ -46,8 +46,8 @@ export class AccountComponent extends AppComponent {
     let secret_key = await CryptUtils.passwordToSecretKey(this.formGroup.value.password!, salt);
     let secret_key_old = await CryptUtils.passwordToSecretKey(this.formGroup.value.password_current!, this.shared.user.salt as ArrayBuffer);
 
-    let hashedPasswordOld = await CryptUtils.hashSecretKey(secret_key);
-    let hashedPassword = await CryptUtils.hashSecretKey(secret_key_old);
+    let hashedPassword = await CryptUtils.hashSecretKey(secret_key);
+    let hashedPasswordOld = await CryptUtils.hashSecretKey(secret_key_old);
 
     let encrypted = await CryptUtils.encryptPrivateKey(this.shared.user.private_key as CryptoKey, secret_key);
 

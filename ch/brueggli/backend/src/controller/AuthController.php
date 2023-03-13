@@ -161,7 +161,7 @@ class AuthController extends IOController
 		$this->checkLogin();
 
 		if (isset($_SESSION) && boolval($_SESSION["is_admin"] ?? false) !== true) {
-			if (!isset($_SESSION["user_id"])) $this->logout(false);
+			if (isset($_SESSION["user_id"])) $this->logout(false);
 
 			$this->sendResponse("error", null, "Sie haben keine Berechtigung", null, 403);
 		}
@@ -175,7 +175,7 @@ class AuthController extends IOController
 	public function checkLogin(): void
 	{
 		if (isset($_SESSION) && !isset($_SESSION["email"])) {
-			if (!isset($_SESSION["user_id"])) $this->logout(false);
+			if (isset($_SESSION["user_id"])) $this->logout(false);
 
 			$this->sendResponse("error", null, "Sie sind nicht angemeldet", null, 403);
 		}
