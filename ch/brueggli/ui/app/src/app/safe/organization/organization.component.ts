@@ -192,6 +192,11 @@ export class SafeOrganizationComponent extends SafeComponent {
    * Sonst wird ein neues erstellt.
    */
   protected async save() {
+    if (this.hasErrors(this.formGroup.controls, "password")) {
+      this.showMessage("Programmmanipulation festgestellt", "error");
+      return;
+    }
+
     let org_id = Number(this.route.snapshot.params["id"]);
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
 
@@ -299,11 +304,16 @@ export class SafeOrganizationComponent extends SafeComponent {
    */
   protected hasErrors(controls: any, allowed: string = ""): boolean {
     for (let control of Object.values(controls) as any) {
-      let errors = Object.keys(control.errors ?? {});
+      if (typeof control === "object" && control !== null) {
+        if (control.hasOwnProperty("controls"))
+          return this.hasErrors(control.controls, allowed);
 
-      if (errors.length) {
-        for (let error of errors) {
-          if (error !== allowed) return true;
+        let errors = Object.keys(control.errors ?? {});
+
+        if (errors.length) {
+          for (let error of errors) {
+            if (error !== allowed) return true;
+          }
         }
       }
     }

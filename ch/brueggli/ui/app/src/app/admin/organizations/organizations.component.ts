@@ -90,6 +90,11 @@ export class OrganizationsComponent extends AdminComponent {
    * Sonst wird eine neue mit einem symmetrischen Schlüssel erstellt.
    */
   protected save() {
+    if (!this.formGroup.valid) {
+      this.showMessage("Programmmanipulation festgestellt", "error");
+      return;
+    }
+
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
     if (id) {
       this.request("PATCH", this.API_HOST + "/admin/organization/" + id, JSON.stringify(this.formGroup.value)).then(response => {

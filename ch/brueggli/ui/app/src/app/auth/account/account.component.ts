@@ -37,6 +37,11 @@ export class AccountComponent extends AppComponent {
    * Speichert die aktualisierten Daten auf dem Server.
    */
   protected async save() {
+    if (!this.formGroup.valid) {
+      this.showMessage("Programmmanipulation festgestellt", "error");
+      return;
+    }
+
     let salt = crypto.getRandomValues(new Uint8Array(16));
     let secret_key = await CryptUtils.passwordToSecretKey(this.formGroup.value.password!, salt);
     let secret_key_old = await CryptUtils.passwordToSecretKey(this.formGroup.value.password_current!, this.shared.user.salt as ArrayBuffer);

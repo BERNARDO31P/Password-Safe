@@ -52,6 +52,11 @@ export class RegisterComponent extends AppComponent {
    * Speichert die Daten, verschlüsselt auf dem Server.
    */
   async register() {
+    if (!this.formGroup.valid) {
+      this.showMessage("Programmmanipulation festgestellt", "error");
+      return;
+    }
+
     let salt = crypto.getRandomValues(new Uint8Array(16));
     let secret_key = await CryptUtils.passwordToSecretKey(this.formGroup.value.password!, salt);
     let password = await CryptUtils.hashSecretKey(secret_key);

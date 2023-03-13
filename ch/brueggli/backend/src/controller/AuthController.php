@@ -63,6 +63,7 @@ class AuthController extends IOController
 		$this->checkPostArguments(["email", "first_name", "last_name", "password", "public_key", "private_key", "salt"]);
 
 		$user = DataRepo::of(User::class)->getByField("email", $_POST["email"]);
+		$domain = explode("@", $_POST["email"])[1];
 		if (count($user)) {
 			$this->writeLog("Registrierung für den Benutzer {first_name} {last_name} / {email} fehlgeschlagen: Email wird bereits verwendet", [
 				"first_name" => $_POST["first_name"],
@@ -70,7 +71,7 @@ class AuthController extends IOController
 				"email" => $_POST["email"]
 			], 409);
 			$this->sendResponse("error", null, "Diese E-Mail Adresse wird bereits verwendet", null, 409);
-		} elseif (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+		} elseif (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL) || !checkdnsrr($domain)) {
 			$this->writeLog("Registrierung für den Benutzer {first_name} {last_name} / {email} fehlgeschlagen: E-Mail Adresse ist ungültig", [
 				"first_name" => $_POST["first_name"],
 				"last_name" => $_POST["last_name"],
