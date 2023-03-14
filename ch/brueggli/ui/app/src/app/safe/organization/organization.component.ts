@@ -276,6 +276,11 @@ export class SafeOrganizationComponent extends SafeComponent {
     let index = this.passwords.data.findIndex(password => password.pass_id === id);
     let password = this.passwords.data[index];
 
+    if (!password.url) {
+      this.showMessage("Bei diesem Passwort wurde keine URL hinterlegt", "error");
+      return;
+    }
+
     window.open(password.url, "_blank");
   }
 
