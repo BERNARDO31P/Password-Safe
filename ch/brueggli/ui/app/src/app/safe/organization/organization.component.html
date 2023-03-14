@@ -43,6 +43,7 @@
 </ng-template>
 <div id="contextmenu" #context>
   <button class="btn" (click)="copyPassword()">Passwort kopieren</button>
+  <button class="btn" (click)="openURL()">URL öffnen</button>
   <button class="btn" (click)="edit()">Bearbeiten</button>
   <button class="btn" (click)="delete()">Löschen</button>
 </div>
@@ -66,6 +67,11 @@
             <label for="description" class="form-label">Beschreibung</label>
             <input type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.description, 'maxlength')"> darf maximal {{formGroup.controls.description.getError('maxLength')['requiredLength']}} Zeichen lang sein</span>
+          </div>
+          <div class="mb-2">
+            <label for="url" class="form-label">Anmelde URL</label>
+            <input type="text" class="form-control" id="url" placeholder="" formControlName="url" autocomplete="url">
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.url, 'pattern')"> muss eine gültige URL sein</span>
           </div>
           <div formGroupName="data">
             <div class="mb-2">

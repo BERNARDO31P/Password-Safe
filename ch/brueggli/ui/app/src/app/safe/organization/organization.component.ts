@@ -37,6 +37,9 @@ export class SafeOrganizationComponent extends SafeComponent {
       description: new FormControl("", [
         Validators.maxLength(256)
       ]),
+      url: new FormControl("", [
+        Validators.pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_+.~#?&\/=]*$/)
+      ]),
       data: new FormGroup({
           account: new FormControl("", [
             Validators.required,
@@ -44,7 +47,6 @@ export class SafeOrganizationComponent extends SafeComponent {
           ]),
           password: new FormControl("", [
             Validators.required,
-            Validators.minLength(11),
             CustomValidators.password({"password": true})
           ]),
           password_repeat: new FormControl("", [
@@ -257,14 +259,24 @@ export class SafeOrganizationComponent extends SafeComponent {
   protected copyPassword() {
     let id = Number(this.contextMenu.nativeElement.dataset["id"]);
 
-    let passwords = this.passwords.data as Array<Password>;
-    let index = passwords.findIndex(password => password.pass_id === id);
+    let index = this.passwords.data.findIndex(password => password.pass_id === id);
+    let credentials = this.passwords.data[index].data as Credentials;
 
-    let password = passwords[index].data as Credentials;
-
-    navigator.clipboard.writeText(password.password).finally(() => {
+    navigator.clipboard.writeText(credentials.password).finally(() => {
       this.showMessage("Erfolgreich das Passwort kopiert", "success");
     })
+  }
+
+  /**
+   * Öffnet die URL des entsprechenden Eintrags in einem neuen Tab.
+   */
+  protected openURL() {
+    let id = Number(this.contextMenu.nativeElement.dataset["id"]);
+
+    let index = this.passwords.data.findIndex(password => password.pass_id === id);
+    let password = this.passwords.data[index];
+
+    window.open(password.url, "_blank");
   }
 
   /**
