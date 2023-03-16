@@ -96,7 +96,7 @@ export class AppComponent implements AfterViewInit {
       };
     }
 
-    const response = await fetch(action + ((params) ? new URLSearchParamsPlus(params): ""), options);
+    const response = await fetch(action + ((params) ? new URLSearchParamsPlus(params) : ""), options);
 
     let parsed: any = {};
     await response.text().then((text) => {
@@ -179,8 +179,7 @@ export class AppComponent implements AfterViewInit {
    *                    1, wenn die Daten nicht definiert/leer sind.
    *                    2, wenn die Daten ungültig sind.
    */
-  protected hasData(data: {data: Array<any>|string, count?: number}): number
-  {
+  protected hasData(data: { data: Array<any> | string, count?: number }): number {
     if (data === undefined) return 1;
     if (data.data === undefined || data.data.length === 0 || typeof data.data === "string") return 2;
     return 0;

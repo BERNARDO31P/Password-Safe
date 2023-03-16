@@ -21,6 +21,12 @@ export class AdminComponent extends AppComponent {
     super(shared, titleService, router, route, changeDetectorRef);
   }
 
+  override ngAfterViewInit() {
+    super.ngAfterViewInit();
+
+    this.setLocation("Admin");
+  }
+
   /**
    * Erneuert die Schlüssel einer Organisation.
    * @param org_id - Die ID der Organisation
