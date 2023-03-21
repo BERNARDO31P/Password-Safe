@@ -124,7 +124,7 @@ class AuthController extends IOController
 	/**
 	 * Gibt das Salz eines Benutzers anhand der E-Mail-Adresse zurück.
 	 * @return void
-	 * @throws Exception Wenn kein Benutzer mit der angegebenen E-Mail-Adresse gefunden wurde.
+	 * @throws Exception Siehe DataRepo
 	 */
 	#[NoReturn] public function getSalt(): void
 	{
