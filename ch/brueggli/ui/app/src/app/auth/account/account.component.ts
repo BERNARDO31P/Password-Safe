@@ -18,7 +18,7 @@ export class AccountComponent extends AppComponent {
     ]),
     password: new FormControl("", [
       Validators.required,
-      Validators.minLength(11),
+      Validators.minLength(14),
       CustomValidators.password({"password": true})
     ]),
     password_repeat: new FormControl("", [
