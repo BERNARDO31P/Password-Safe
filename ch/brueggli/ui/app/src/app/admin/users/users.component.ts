@@ -9,6 +9,7 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {User} from "src/assets/js/model/User";
 import {SecretKey} from "src/assets/js/model/SecretKey";
 import {Organization} from "src/assets/js/model/Organization";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "admin-users",
@@ -104,19 +105,22 @@ export class UsersComponent extends AdminComponent {
    */
   protected save() {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
-    this.request("PATCH", this.API_HOST + "/admin/user/" + id, JSON.stringify(this.formGroup.value)).then(response => {
+    this.request("PATCH", this.API_HOST + "/admin/user/" + id, JSON.stringify(this.formGroup.value)).then(async response => {
       if (response.status === "success") {
+        this.showLoading();
+
         if (this.user.is_admin !== this.formGroup.value.is_admin) {
           if (this.formGroup.value.is_admin) {
-            this.addOrganizationsKey();
+            await this.addOrganizationsKey()
           } else {
-            this.request("DELETE", this.API_HOST + "/admin/user/" + id + "/admin").then(response => {
-              if (response.status === "success") {
-                this.renewOrganizationsKeys();
-              }
-            });
+            let response = await this.request("DELETE", this.API_HOST + "/admin/user/" + id + "/admin");
+            if (response.status === "success") {
+              await this.renewOrganizationsKeys();
+            }
           }
         }
+
+        this.showMessage(response.message, response.status);
 
         this.user = {...this.user, ...this.formGroup.value as User};
 
@@ -161,6 +165,8 @@ export class UsersComponent extends AdminComponent {
 
         this.request("DELETE", this.API_HOST + "/admin/user/" + id).then(async response => {
           if (response.status === "success") {
+            this.showLoading();
+
             if (user.is_admin) {
               await this.renewOrganizationsKeys();
             } else {
@@ -168,6 +174,7 @@ export class UsersComponent extends AdminComponent {
                 await this.renewOrganizationKeys(member.org_id);
               }
             }
+            this.showMessage(response.message, response.status);
             this.loadData();
           }
         });

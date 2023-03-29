@@ -121,17 +121,31 @@ export class AppComponent implements AfterViewInit {
   /**
    * Zeigt eine Benachrichtigung auf dem Bildschirm an
    * @param {string} message Die Nachricht, die angezeigt werden soll
-   * @param {SweetAlertIcon} type Das Symbol, das in der Benachrichtigung angezeigt werden soll
+   * @param {SweetAlertIcon | string} type Das Symbol, das in der Benachrichtigung angezeigt werden soll
    */
-  protected showMessage(message: string, type: SweetAlertIcon): void {
+  protected showMessage(message: string, type: SweetAlertIcon | string): void {
     Swal.fire({
       title: message,
-      icon: type,
+      icon: type as SweetAlertIcon,
       position: "top-end",
       timer: 2000,
       toast: true,
       showConfirmButton: false,
       timerProgressBar: true
+    });
+  }
+
+  /**
+   * Zeigt eine Ladeanimation an, sodass der Benutzer über Hintergrundaktivitäten Bescheid weiss
+   */
+  protected showLoading(): void {
+    Swal.fire({
+      title: "Bitte warten!",
+      html: "Die Anfrage wird verarbeitet...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading()
+      }
     });
   }
 

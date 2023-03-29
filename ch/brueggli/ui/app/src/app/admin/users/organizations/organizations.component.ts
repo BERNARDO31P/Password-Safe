@@ -87,6 +87,8 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
    */
   protected override add() {
     let org_id = Number(this.contextMenu.nativeElement.dataset["id"]);
+
+    this.showLoading();
     this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/key").then(async response => {
       if (response.status === "success") {
         let secret_key_entry = response.data;
@@ -139,8 +141,10 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
         let member_index = this.userOrganizations.findIndex(member => member.org_id === org_id);
         this.userOrganizations.splice(member_index, 1);
 
+        this.showLoading();
         if (!this.user.is_admin) {
           await this.renewOrganizationKeys(org_id);
+          this.showMessage(response.message, response.status);
         }
       }
     });

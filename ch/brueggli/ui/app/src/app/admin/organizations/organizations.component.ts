@@ -108,22 +108,28 @@ export class OrganizationsComponent extends AdminComponent {
         }
       });
     } else {
-      this.request("POST", this.API_HOST + "/admin/organizations", JSON.stringify(this.formGroup.value)).then(response => {
+      this.request("POST", this.API_HOST + "/admin/organizations", JSON.stringify(this.formGroup.value)).then(async response => {
         if (response.status === "success") {
+          this.showLoading();
+
           this.organizations.data.push(response.data);
           this.organizations.count!++;
 
           let org_id = response.data.org_id;
 
-          this.request("GET", this.API_HOST + "/admin/users/admins").then(async response => {
-            if (response.status === "success") {
-              let secret_keys = await CryptUtils.generateSecretKeys(response.data, org_id);
+          new Promise<void>((resolve) => {
+            this.request("GET", this.API_HOST + "/admin/users/admins").then(async response => {
+              if (response.status === "success") {
+                let secret_keys = await CryptUtils.generateSecretKeys(response.data, org_id);
 
-              this.request("POST", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
-            }
+                await this.request("POST", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
+                resolve();
+              }
+            });
+          }).then(() => {
+            this.showMessage(response.message, response.status);
+            this.modal.hide();
           });
-
-          this.modal.hide();
         }
       });
     }
@@ -164,7 +170,10 @@ export class OrganizationsComponent extends AdminComponent {
 
     let secret_key = await CryptUtils.generateSecretKey();
 
+    this.showLoading();
     await this.updateOrganizationData(id, secret_key);
     await this.updateOrganizationMembers(id, secret_key);
+
+    this.showMessage("Schlüssel erfolgreich erneuert", "success");
   }
 }
