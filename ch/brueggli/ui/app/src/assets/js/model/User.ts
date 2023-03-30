@@ -9,5 +9,6 @@ export type User = {
   last_login?: number,
   private_key: CryptoKey | string,
   public_key: CryptoKey | string,
+  sign_private_key: CryptoKey | string,
   salt: ArrayBuffer | string,
 }

@@ -49,12 +49,14 @@ export class AccountComponent extends AppComponent {
     let hashedPassword = await CryptUtils.hashSecretKey(secret_key);
     let hashedPasswordOld = await CryptUtils.hashSecretKey(secret_key_old);
 
-    let encrypted = await CryptUtils.encryptPrivateKey(this.shared.user.private_key as CryptoKey, secret_key);
+    let private_key = await CryptUtils.encryptPrivateKey(this.shared.user.private_key as CryptoKey, secret_key);
+    let sign_private_key = await CryptUtils.encryptPrivateKey(this.shared.user.sign_private_key as CryptoKey, secret_key);
 
     let data = {
       password_old: hashedPasswordOld,
       password: hashedPassword,
-      private_key: encrypted,
+      private_key: private_key,
+      sign_private_key: sign_private_key,
       salt: CryptUtils.arrayToBase64(salt)
     }
 

@@ -90,7 +90,7 @@ export class CryptUtils {
     let secret_key = await this.passwordToSecretKey(user.password, user.salt);
 
     user.private_key = await this.decryptPrivateKey(secret_key, user.private_key as string);
-    user.public_key = await this.getPublicKey(user.public_key as string);
+    user.sign_private_key = await this.decryptSignPrivateKey(secret_key, user.sign_private_key as string);
 
     return user;
   }
@@ -107,6 +107,17 @@ export class CryptUtils {
   }
 
   /**
+   * Importiert den öffentlichen Schlüssel im base64-Format und gibt das resultierende CryptoKey-Objekt zurück.
+   * @param {string} base64Key Der öffentliche Schlüssel im base64-Format
+   * @return {Promise<CryptoKey>} Ein CryptoKey-Objekt, das den öffentlichen Schlüssel repräsentiert
+   */
+  static async getSignPublicKey(base64Key: string): Promise<CryptoKey> {
+    let publicKey = this.base64ToArray(base64Key);
+
+    return await crypto.subtle.importKey("spki", publicKey, {name: "ECDSA", namedCurve: "P-521"}, false, ["verify"]);
+  }
+
+  /**
    * Entschlüsselt den privaten Schlüssel im base64-Format mit dem gegebenen geheimen Schlüssel und gibt das resultierende CryptoKey-Objekt zurück.
    * @param {CryptoKey} secretKey Der geheime Schlüssel, mit dem der private Schlüssel entschlüsselt werden soll
    * @param {string} base64Key Der zu entschlüsselnde private Schlüssel im base64-Format
@@ -119,6 +130,21 @@ export class CryptUtils {
     const decrypted = await crypto.subtle.decrypt({name: "AES-GCM", iv: split[0], length: 256, tagLength: 128}, secretKey, split[1]);
 
     return await crypto.subtle.importKey("pkcs8", decrypted, {name: "RSA-OAEP", hash: "SHA-512"}, true, ["decrypt"]);
+  }
+
+  /**
+   * Entschlüsselt den privaten Schlüssel im base64-Format mit dem gegebenen geheimen Schlüssel und gibt das resultierende CryptoKey-Objekt zurück.
+   * @param {CryptoKey} secretKey Der geheime Schlüssel, mit dem der private Schlüssel entschlüsselt werden soll
+   * @param {string} base64Key Der zu entschlüsselnde private Schlüssel im base64-Format
+   * @return {Promise<CryptoKey>} Ein CryptoKey-Objekt, das den entschlüsselten privaten Schlüssel repräsentiert
+   */
+  static async decryptSignPrivateKey(secretKey: CryptoKey, base64Key: string): Promise<CryptoKey> {
+    const encrypted = this.base64ToArray(base64Key);
+    const split = this.splitArrayBuffer(encrypted, 16);
+
+    const decrypted = await crypto.subtle.decrypt({name: "AES-GCM", iv: split[0], length: 256, tagLength: 128}, secretKey, split[1]);
+
+    return await crypto.subtle.importKey("pkcs8", decrypted, {name: "ECDSA", namedCurve: "P-521"}, true, ["sign"]);
   }
 
   /**
@@ -244,6 +270,23 @@ export class CryptUtils {
       },
       true,
       ["encrypt", "decrypt"]
+    ) as CryptoKeyPair;
+  }
+
+  /**
+   * Generiert ein neues Schlüsselpaar mit den folgenden Eigenschaften:
+   * Algorithmus: ECDSA
+   * Kurve: P-521
+   * @return {Promise<CryptoKeyPair>} Das generierte Schlüsselpaar als CryptoKeyPair-Objekt.
+   */
+  static async generateSignKeyPair(): Promise<CryptoKeyPair> {
+    return await crypto.subtle.generateKey(
+      {
+        name: "ECDSA",
+        namedCurve: "P-521"
+      },
+      true,
+      ["sign", "verify"]
     ) as CryptoKeyPair;
   }
 

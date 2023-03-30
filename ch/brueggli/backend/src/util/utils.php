@@ -31,6 +31,7 @@ function removeArrayKeys(array|object $modify, array $keys): array|object
 		}
 	} else {
 		foreach ($modify as $key => $value) {
+			error_log($value);
 			$modify[$key] = removeArrayKeys(!is_object($value) ? $value : $value->toArray(), $keys);
 		}
 	}
@@ -91,12 +92,18 @@ function getArrayKeys(array|object|null $modify, array $keys): array|object|null
  * Entfernt alle Vorkommen des angegebenen Werts aus dem Array.
  *
  * @param array $array Das Array, aus dem der Wert entfernt werden soll.
- * @param mixed $value Der Wert, der entfernt werden soll.
- * @return array Das Array ohne den entfernten Wert.
+ * @param array $value Die Werte, welche entfernt werden sollen.
+ * @return array Das Array ohne die entfernten Werte.
  */
-function arrayRemove(array $array, mixed $value): array
+function removeArrayValues(array $array, array $value): array
 {
-	return array_values(array_filter($array, fn($entry) => $entry !== $value));
+	foreach ($array as $key => $val) {
+		if (in_array($val, $value)) {
+			unset($array[$key]);
+		}
+	}
+
+	return array_values($array);
 }
 
 /**

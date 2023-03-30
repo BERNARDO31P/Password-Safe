@@ -9,7 +9,6 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {User} from "src/assets/js/model/User";
 import {SecretKey} from "src/assets/js/model/SecretKey";
 import {Organization} from "src/assets/js/model/Organization";
-import Swal from "sweetalert2";
 
 @Component({
   selector: "admin-users",
@@ -107,9 +106,10 @@ export class UsersComponent extends AdminComponent {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
     this.request("PATCH", this.API_HOST + "/admin/user/" + id, JSON.stringify(this.formGroup.value)).then(async response => {
       if (response.status === "success") {
-        this.showLoading();
+        this.modal.hide();
 
         if (this.user.is_admin !== this.formGroup.value.is_admin) {
+          this.showLoading();
           if (this.formGroup.value.is_admin) {
             await this.addOrganizationsKey()
           } else {
@@ -118,16 +118,13 @@ export class UsersComponent extends AdminComponent {
               await this.renewOrganizationsKeys();
             }
           }
+          this.showMessage(response.message, response.status);
         }
-
-        this.showMessage(response.message, response.status);
 
         this.user = {...this.user, ...this.formGroup.value as User};
 
         let index = this.users.data.findIndex(user => user.user_id === id);
         this.users.data[index] = this.user;
-
-        this.modal.hide();
       }
     });
   }
@@ -203,7 +200,7 @@ export class UsersComponent extends AdminComponent {
         let secret_key_user = {
           user_id: this.user.user_id,
           org_id: secret_key_admin.org_id,
-          secret_key: await CryptUtils.encryptSecretKey(secret_key, public_key)
+          secret_key: await CryptUtils.encryptSecretKey(secret_key, public_key),
         } as SecretKey;
 
         secret_keys.push(secret_key_user);

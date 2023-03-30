@@ -62,16 +62,26 @@ export class RegisterComponent extends AppComponent {
     let password = await CryptUtils.hashSecretKey(secret_key);
 
     let keyPair = await CryptUtils.generateKeyPair();
+    let keySignPair = await CryptUtils.generateSignKeyPair();
     let private_key = await CryptUtils.encryptPrivateKey(keyPair.privateKey, secret_key);
     let public_key = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+
+    let sign_private_key = await CryptUtils.encryptPrivateKey(keySignPair.privateKey, secret_key);
+    let sign_public_key = await crypto.subtle.exportKey("spki", keySignPair.publicKey);
 
     let formData = structuredClone(this.formGroup.value) as Record<string, any>;
     delete formData["password_repeat"];
 
     formData["password"] = password;
+    formData["salt"] = CryptUtils.arrayToBase64(salt);
+
     formData["private_key"] = private_key;
     formData["public_key"] = CryptUtils.arrayToBase64(public_key);
-    formData["salt"] = CryptUtils.arrayToBase64(salt);
+
+    formData["sign_private_key"] = sign_private_key;
+    formData["sign_public_key"] = CryptUtils.arrayToBase64(sign_public_key);
+
+
 
     this.request("post", this.API_HOST + "/auth/register", JSON.stringify(formData)).then(async response => {
       if (response.status == "success") {

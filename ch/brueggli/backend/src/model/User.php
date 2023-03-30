@@ -34,5 +34,9 @@ class User implements JsonSerializable
 	#[db_column]
 	public string $private_key = "";
 	#[db_column]
+	public string $sign_public_key = "";
+	#[db_column]
+	public string $sign_private_key = "";
+	#[db_column]
 	public string $salt = "";
 }

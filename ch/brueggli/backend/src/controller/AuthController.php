@@ -12,6 +12,7 @@ use model\User;
 use trait\getter;
 
 use function util\removeArrayKeys;
+use function util\removeArrayValues;
 
 class AuthController extends IOController
 {
@@ -60,7 +61,8 @@ class AuthController extends IOController
 	 */
 	#[NoReturn] public function register(): void
 	{
-		$this->checkPostArguments(["email", "first_name", "last_name", "password", "public_key", "private_key", "salt"]);
+		$arguments = removeArrayValues(User::getDbFields(), ["user_id", "is_admin", "is_suspended", "last_login"]);
+		$this->checkPostArguments($arguments);
 
 		$user = DataRepo::of(User::class)->getByField("email", $_POST["email"]);
 		$domain = explode("@", $_POST["email"])[1];
@@ -103,7 +105,7 @@ class AuthController extends IOController
 	 */
 	#[NoReturn] public function updateAccount(): void
 	{
-		$this->checkPostArguments(["password", "password_old", "private_key", "salt"]);
+		$this->checkPostArguments(["password", "password_old", "private_key", "sign_private_key", "salt"]);
 
 		$user = $this->_getUser($_SESSION["user_id"]);
 
