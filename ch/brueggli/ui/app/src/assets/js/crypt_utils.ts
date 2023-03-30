@@ -107,17 +107,6 @@ export class CryptUtils {
   }
 
   /**
-   * Importiert den öffentlichen Schlüssel im base64-Format und gibt das resultierende CryptoKey-Objekt zurück.
-   * @param {string} base64Key Der öffentliche Schlüssel im base64-Format
-   * @return {Promise<CryptoKey>} Ein CryptoKey-Objekt, das den öffentlichen Schlüssel repräsentiert
-   */
-  static async getSignPublicKey(base64Key: string): Promise<CryptoKey> {
-    let publicKey = this.base64ToArray(base64Key);
-
-    return await crypto.subtle.importKey("spki", publicKey, {name: "ECDSA", namedCurve: "P-521"}, false, ["verify"]);
-  }
-
-  /**
    * Entschlüsselt den privaten Schlüssel im base64-Format mit dem gegebenen geheimen Schlüssel und gibt das resultierende CryptoKey-Objekt zurück.
    * @param {CryptoKey} secretKey Der geheime Schlüssel, mit dem der private Schlüssel entschlüsselt werden soll
    * @param {string} base64Key Der zu entschlüsselnde private Schlüssel im base64-Format
@@ -144,7 +133,7 @@ export class CryptUtils {
 
     const decrypted = await crypto.subtle.decrypt({name: "AES-GCM", iv: split[0], length: 256, tagLength: 128}, secretKey, split[1]);
 
-    return await crypto.subtle.importKey("pkcs8", decrypted, {name: "ECDSA", namedCurve: "P-521"}, true, ["sign"]);
+    return await crypto.subtle.importKey("pkcs8", decrypted, {name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256'}, true, ["sign"]);
   }
 
   /**
@@ -159,6 +148,26 @@ export class CryptUtils {
     let encrypted = await crypto.subtle.encrypt({name: "AES-GCM", iv: iv, length: 256, tagLength: 128}, secretKey, key) as Uint8Array;
 
     return this.arrayToBase64(this.concatenateArrayBuffers(iv, encrypted));
+  }
+
+  /**
+   * Exportiert den öffentlichen Schlüssel im base64-Format und gibt diesen im PEM-Format zurück.
+   * @param {CryptoKey} publicKey Der öffentliche Schlüssel, der exportiert werden soll
+   * @return {Promise<string>} Der öffentliche Schlüssel im PEM-Format
+   */
+  static async exportSignPublicKey(publicKey: CryptoKey): Promise<string> {
+    const exported = await crypto.subtle.exportKey("spki", publicKey);
+    return `-----BEGIN PUBLIC KEY-----\n${this.arrayToBase64(exported).match(/.{1,64}/g)!.join('\n')}\n-----END PUBLIC KEY-----`;
+  }
+
+  /**
+   * Exportiert den öffentlichen Schlüssel im base64-Format und gibt diesen zurück.
+   * @param {CryptoKey} publicKey Der öffentliche Schlüssel, der exportiert werden soll
+   * @return {Promise<string>} Der öffentliche Schlüssel im base64-Format
+   */
+  static async exportPublicKey(publicKey: CryptoKey): Promise<string> {
+    const exported = await crypto.subtle.exportKey("spki", publicKey);
+    return this.arrayToBase64(exported);
   }
 
   /**
@@ -224,6 +233,19 @@ export class CryptUtils {
   }
 
   /**
+   * Signiert die verschlüsselten Daten mit dem gegebenen privaten Schlüssel.
+   * Gibt die Signatur als Base64-kodierte Zeichenfolge zurück.
+   * @param {string} base64Data Die verschlüsselten Daten als Base64-kodierte Zeichenfolge.
+   * @param {CryptoKey} privateKey Der private Schlüssel, der zum Signieren der Daten verwendet werden soll.
+   * @return {Promise<string>} Die Signatur als Base64-kodierte Zeichenfolge.
+   */
+  static async signData(base64Data: string, privateKey: CryptoKey): Promise<string> {
+    const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, this.base64ToArray(base64Data));
+
+    return this.arrayToBase64(signature);
+  }
+
+  /**
    * Leitet einen geheimen Schlüssel aus dem gegebenen Passwort und Salt ab.
    * Das abgeleitete Schlüsselobjekt kann dann zum Verschlüsseln und Entschlüsseln von Daten verwendet werden.
    * @param {string} password Das Passwort, aus dem der Schlüssel abgeleitet werden soll.
@@ -282,8 +304,10 @@ export class CryptUtils {
   static async generateSignKeyPair(): Promise<CryptoKeyPair> {
     return await crypto.subtle.generateKey(
       {
-        name: "ECDSA",
-        namedCurve: "P-521"
+        name: "RSASSA-PKCS1-v1_5",
+        hash: "SHA-256",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
       },
       true,
       ["sign", "verify"]

@@ -10,5 +10,6 @@ export type User = {
   private_key: CryptoKey | string,
   public_key: CryptoKey | string,
   sign_private_key: CryptoKey | string,
+  sign_public_key: CryptoKey | string,
   salt: ArrayBuffer | string,
 }

@@ -25,6 +25,7 @@ class Password implements JsonSerializable
 	public string $url = "";
 	#[db_column]
 	public string $data = "";
+	public string $sign = "";
 
 	#[db_column, db_foreign_key(Organization::class)]
 	public int $org_id = 0;

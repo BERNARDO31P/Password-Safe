@@ -6,6 +6,7 @@ export type Password = {
   description?: string,
   url?: string,
   data: Credentials | string,
+  sign: string,
   org_id: number
 
 }

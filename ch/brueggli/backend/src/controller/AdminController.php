@@ -6,8 +6,11 @@ use lib\DataRepo\DataRepo;
 
 use model\SecretKey;
 
+use trait\getter;
+
 class AdminController extends IOController
 {
+	use getter;
 	/**
 	 * Prüft, ob der Benutzer Berechtigung hat, diese Aktion durchzuführen.
 	 * z.B. darf dieser sich nicht selbst oder das Root-Konto verändern.
@@ -36,6 +39,19 @@ class AdminController extends IOController
 
 		if (!count($secret_key)) {
 			$this->sendResponse("error", null, "Sie dürfen keine Aktion auf diesen Tresor tätigen", null, 401);
+		}
+	}
+
+	protected function checkSignature($data, $signature): void
+	{
+		$data = base64_decode($data);
+		$signature = base64_decode($signature);
+
+		$user = $this->_getUser($_SESSION["user_id"]);
+		$public_key = openssl_pkey_get_public($user->sign_public_key);
+
+		if (!openssl_verify($data, $signature, $public_key, OPENSSL_ALGO_SHA256)) {
+			$this->sendResponse("error", null, "Manipulation der Daten festgestellt, ändern Sie Ihr Passwort schnellstmöglich", null, 403);
 		}
 	}
 

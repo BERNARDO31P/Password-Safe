@@ -207,7 +207,10 @@ export class SafeOrganizationComponent extends SafeComponent {
     password.pass_id = id;
 
     let encrypted = structuredClone(password);
-    encrypted.data = await CryptUtils.encryptData(password.data as Credentials, this.secret_key);
+    let data = await CryptUtils.encryptData(password.data as Credentials, this.secret_key);
+
+    encrypted.data = data;
+    encrypted.sign = await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey);
 
     if (password.pass_id) {
       this.request("PATCH", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {

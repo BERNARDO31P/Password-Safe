@@ -5,15 +5,14 @@ namespace controller;
 use Exception;
 
 use JetBrains\PhpStorm\NoReturn;
-
 use lib\DataRepo\DataRepo;
 
-use model\Password;
-
-use trait\getter;
 use model\Member;
 use model\Organization;
 use model\SecretKey;
+use model\Password;
+
+use trait\getter;
 
 class SafeController extends AdminController
 {
@@ -90,10 +89,11 @@ class SafeController extends AdminController
 	 */
 	#[NoReturn] public function addPassword(): void
 	{
-		$this->checkPostArguments(["name", "org_id"]);
+		$this->checkPostArguments(["name", "org_id", "data", "sign"]);
 		$this->checkSafeAllowance($_POST["org_id"]);
 
 		$password = Password::fromObj($_POST);
+		$this->checkSignature($password->data, $password->sign);
 
 		if (!DataRepo::insert($password)) {
 			$this->sendResponse("error", null, "Beim Hinzufügen des Passworts ist ein Fehler aufgetreten", null, 500);
@@ -108,7 +108,7 @@ class SafeController extends AdminController
 	 */
 	#[NoReturn] public function updatePassword(): void
 	{
-		$this->checkPostArguments(["name", "org_id", "pass_id"]);
+		$this->checkPostArguments(["name", "org_id", "pass_id", "data", "sign"]);
 		$this->checkSafeAllowance($_POST["org_id"]);
 
 		$password = Password::fromObj($_POST);

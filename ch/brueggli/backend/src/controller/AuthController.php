@@ -49,7 +49,7 @@ class AuthController extends IOController
 		DataRepo::update($user[0]);
 		$_SESSION = $user[0]->toArray();
 
-		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Erfolgreich angemeldet");
+		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login", "public_key", "sign_public_key"]), "Erfolgreich angemeldet");
 	}
 
 	/**
@@ -93,7 +93,7 @@ class AuthController extends IOController
 		}
 		$_SESSION = $user->toArray();
 
-		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Erfolgreich registriert");
+		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login", "public_key", "sign_public_key"]), "Erfolgreich registriert");
 	}
 
 	/**
@@ -120,7 +120,7 @@ class AuthController extends IOController
 
 		$_SESSION = $user->toArray();
 
-		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login"]), "Die Benutzerdaten wurden angepasst");
+		$this->sendResponse("success", removeArrayKeys($_SESSION, ["is_suspended", "password", "last_login", "public_key", "sign_public_key"]), "Die Benutzerdaten wurden angepasst");
 	}
 
 	/**
