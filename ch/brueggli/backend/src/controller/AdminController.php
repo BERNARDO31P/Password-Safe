@@ -42,7 +42,13 @@ class AdminController extends IOController
 		}
 	}
 
-	protected function checkSignature($data, $signature): void
+	/**
+	 * Prüft, ob die Signatur mit den Daten und dem öffentlichen Schlüssel des Benutzers übereinstimmt.
+	 * @param string $data Die Daten, die signiert wurden.
+	 * @param string $signature Die Signatur.
+	 * @return void
+	 */
+	protected function checkSignature(string $data, string $signature): void
 	{
 		$data = base64_decode($data);
 		$signature = base64_decode($signature);
