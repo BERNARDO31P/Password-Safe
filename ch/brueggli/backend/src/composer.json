@@ -1,8 +1,6 @@
 {
     "require": {
         "bramus/router": "^1.6.1",
-        "monolog/monolog": "^3.3",
-        "phpseclib/phpseclib": "3.0",
-        "starkbank/ecdsa": "^2.0"
+        "monolog/monolog": "^3.3"
     }
 }
