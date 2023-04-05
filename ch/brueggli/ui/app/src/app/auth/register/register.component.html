@@ -23,7 +23,10 @@
   </div>
   <div class="mb-2">
     <label for="password" class="form-label">Passwort</label>
-    <input type="password" [ngClass]="{'error': checkFormControl(formGroup.controls.password)}" class="form-control" id="password" placeholder="***********" formControlName="password" autocomplete="new-password">
+    <div class="d-flex">
+      <input type="password" [ngClass]="{'error': checkFormControl(formGroup.controls.password)}" class="form-control d-inline" id="password" placeholder="***********" formControlName="password" autocomplete="new-password">
+      <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+    </div>
     <span class="error" *ngIf="checkFormControl(formGroup.controls.password, 'required')"> wurde nicht ausgefüllt</span>
     <span class="error" *ngIf="checkFormControl(formGroup.controls.password, 'contains')"> darf den Vor- und Nachnamen nicht enthalten</span>
     <span class="error" *ngIf="checkFormControl(formGroup.controls.password, 'minlength')"> muss mindestens {{formGroup.controls.password.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
@@ -31,7 +34,10 @@
   </div>
   <div class="mb-2">
     <label for="password_repeat" class="form-label">Passwort wiederholen</label>
-    <input type="password" [ngClass]="{'error': checkFormControl(formGroup.controls.password_repeat)}" class="form-control" id="password_repeat" placeholder="***********" formControlName="password_repeat" autocomplete="new-password">
+    <div class="d-flex">
+      <input type="password" [ngClass]="{'error': checkFormControl(formGroup.controls.password_repeat)}" class="form-control d-inline" id="password_repeat" placeholder="***********" formControlName="password_repeat" autocomplete="new-password">
+      <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+    </div>
     <span class="error" *ngIf="checkFormControl(formGroup.controls.password_repeat, 'required')"> wurde nicht ausgefüllt</span>
     <span class="error" *ngIf="checkFormControl(formGroup.controls.password_repeat, 'matching')"> passwörter stimmen nicht überein</span>
   </div>

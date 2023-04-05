@@ -9,7 +9,12 @@
     <table class="table">
       <thead>
       <tr>
-        <th class="text-nowrap" *ngFor="let key of Object.keys(users.data[0]) | slice:1">{{translation[key]}}</th>
+        <th class="text-nowrap" *ngFor="let key of Object.keys(users.data[0]) | slice:1">
+          {{translation[key]}}
+          <!--<div class="d-inline-block sort">
+            <i class="bi bi-arrow-down"></i>
+          </div>-->
+        </th>
       </tr>
       </thead>
       <tbody>
@@ -56,20 +61,20 @@
         <form [formGroup]="formGroup" (ngSubmit)="save()">
           <div class="mb-3">
             <label for="email" class="form-label">Email-Adresse</label>
-            <input tabindex="0" type="email" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
+            <input tabindex="0" type="email" [ngClass]="{'error': checkFormControl(formGroup.controls.email)}" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.email, 'required')"> wurde nicht ausgefüllt</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.email, 'email')"> ist ungültig: hans.muster@beispiel.ch</span>
           </div>
           <div class="mb-2">
             <label for="first_name" class="form-label">Vorname</label>
-            <input type="text" class="form-control" id="first_name" placeholder="Hans" formControlName="first_name" autocomplete="first_name">
+            <input type="text" [ngClass]="{'error': checkFormControl(formGroup.controls.first_name)}" class="form-control" id="first_name" placeholder="Hans" formControlName="first_name" autocomplete="first_name">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.first_name, 'required')"> wurde nicht ausgefüllt</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.first_name, 'minlength')"> muss mindestens {{formGroup.controls.first_name.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.first_name, 'maxlength')"> darf maximal {{formGroup.controls.first_name.getError('maxlength')['requiredLength']}} Zeichen lang sein</span>
           </div>
           <div class="mb-2">
             <label for="last_name" class="form-label">Nachname</label>
-            <input type="text" class="form-control" id="last_name" placeholder="Muster" formControlName="last_name" autocomplete="last_name">
+            <input type="text" [ngClass]="{'error': checkFormControl(formGroup.controls.last_name)}" class="form-control" id="last_name" placeholder="Muster" formControlName="last_name" autocomplete="last_name">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.last_name, 'required')"> wurde nicht ausgefüllt</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.last_name, 'minlength')"> muss mindestens {{formGroup.controls.last_name.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.last_name, 'maxlength')"> darf maximal {{formGroup.controls.last_name.getError('maxlength')['requiredLength']}} Zeichen lang sein</span>

@@ -59,33 +59,33 @@
         <form [formGroup]="formGroup" (ngSubmit)="save()">
           <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input tabindex="0" type="text" class="form-control" id="name" placeholder="Brüggli vSphere Admin" formControlName="name" autocomplete="name">
+            <input tabindex="0" type="text" [ngClass]="{'error': checkFormControl(formGroup.controls.name)}" class="form-control" id="name" placeholder="Brüggli vSphere Admin" formControlName="name" autocomplete="name">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'required')"> wurde nicht ausgefüllt</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'minlength')"> muss mindestens {{formGroup.controls.name.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
           </div>
           <div class="mb-2">
             <label for="description" class="form-label">Beschreibung</label>
-            <textarea type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description"></textarea>
+            <textarea type="text" [ngClass]="{'error': checkFormControl(formGroup.controls.description)}" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description"></textarea>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.description, 'maxlength')"> darf maximal {{formGroup.controls.description.getError('maxLength')['requiredLength']}} Zeichen lang sein</span>
           </div>
           <div class="mb-2">
             <label for="url" class="form-label">Anmelde URL</label>
-            <input type="text" class="form-control" id="url" placeholder="" formControlName="url" autocomplete="url">
+            <input type="text" [ngClass]="{'error': checkFormControl(formGroup.controls.url)}" class="form-control" id="url" placeholder="" formControlName="url" autocomplete="url">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.url, 'pattern')"> muss eine gültige URL sein</span>
           </div>
           <div formGroupName="data">
             <div class="mb-2">
               <label for="account" class="form-label">Benutzername/E-Mail</label>
-              <input type="text" class="form-control" id="account" placeholder="" formControlName="account" autocomplete="account">
+              <input type="text" [ngClass]="{'error': checkFormControl(formGroup.controls.data.controls.account)}" class="form-control" id="account" placeholder="" formControlName="account" autocomplete="account">
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.account, 'required')"> wurde nicht ausgefüllt</span>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.account, 'minlength')"> muss mindestens {{formGroup.controls.data.controls.account.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
             </div>
             <div class="mb-2">
               <label for="password" class="form-label">Passwort</label>
               <div class="d-flex">
-                <input type="password" class="form-control d-inline" id="password" placeholder="" formControlName="password" autocomplete="new-password">
+                <input type="password" [ngClass]="{'error': checkFormControl(formGroup.controls.data.controls.password)}" class="form-control d-inline" id="password" placeholder="" formControlName="password" autocomplete="new-password">
                 <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
-                <button tabindex="-1" type="button" class="btn" (click)="generatePassword()"><i class="bi bi-arrow-repeat"></i></button>
+                <button tabindex="-1" type="button" class="btn out-input" (click)="generatePassword()"><i class="bi bi-arrow-repeat"></i></button>
               </div>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'required')"> wurde nicht ausgefüllt</span>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'minlength')"> muss mindestens {{formGroup.controls.data.controls.password.getError('minlength')['requiredLength']}}
@@ -95,7 +95,7 @@
             <div class="mb-2">
               <label for="password_repeat" class="form-label">Passwort wiederholen</label>
               <div class="d-flex">
-                <input type="password" class="form-control" id="password_repeat" placeholder="" formControlName="password_repeat" autocomplete="new-password">
+                <input type="password" [ngClass]="{'error': checkFormControl(formGroup.controls.data.controls.password_repeat)}" class="form-control" id="password_repeat" placeholder="" formControlName="password_repeat" autocomplete="new-password">
                 <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
               </div>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password_repeat, 'required')"> wurde nicht ausgefüllt</span>

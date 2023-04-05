@@ -6,7 +6,10 @@
   </div>
   <div class="mb-3">
     <label for="password" class="form-label">Passwort</label>
-    <input type="password" class="form-control" id="password" placeholder="***********" formControlName="password" autocomplete="current-password">
+    <div class="d-flex">
+      <input type="password" class="form-control d-inline" id="password" placeholder="***********" formControlName="password" autocomplete="current-password">
+      <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+    </div>
   </div>
   <button type="submit" [disabled]="!formGroup.valid" class="btn btn-primary">Anmelden</button>
 </form>

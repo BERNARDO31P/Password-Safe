@@ -259,27 +259,6 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
   }
 
   /**
-   * Schaltet das Anzeigen des Passworts um, wenn der dazugehörige Knopf angeklickt wird.
-   * @param {Event} event Das auslösende Ereignis.
-   * @return {void}
-   */
-  protected togglePassword(event: Event) {
-    let button = event.currentTarget as HTMLButtonElement;
-    let icon = button.querySelector("i") as HTMLImageElement;
-    let input = this.previousElementSibling(button, "input") as HTMLInputElement;
-
-    if (input.type === "password") {
-      input.type = "text";
-      icon.classList.remove("bi-eye");
-      icon.classList.add("bi-eye-slash");
-    } else {
-      input.type = "password";
-      icon.classList.remove("bi-eye-slash");
-      icon.classList.add("bi-eye");
-    }
-  }
-
-  /**
    * Kopiert das Passwort des entsprechenden Eintrags in die Zwischenablage.
    */
   protected copyPassword() {
@@ -317,25 +296,6 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     const password = new RandExp(CustomValidators.patternGenerate).gen();
 
     this.formGroup.patchValue({data: {password: password, password_repeat: password}});
-  }
-
-  /**
-   * Gibt das vorherige Element im DOM zurück, das dem gegebenen Selektor entspricht.
-   * Wenn kein passendes Element gefunden wird, wird null zurückgegeben.
-   * @param {HTMLElement} element Das Ausgangselement.
-   * @param {string} selector Der Selektor des gesuchten Elements.
-   * @return {HTMLElement|null} Das gefundene Element oder null.
-   */
-  protected previousElementSibling(element: HTMLElement, selector: string): HTMLElement | null {
-    let previousSibling = element.previousElementSibling;
-
-    if (previousSibling !== null) {
-      if (!previousSibling.matches(selector))
-        previousSibling = this.previousElementSibling(previousSibling as HTMLElement, selector);
-
-      return previousSibling as HTMLElement;
-    }
-    return null;
   }
 
   /**
