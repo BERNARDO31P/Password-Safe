@@ -129,7 +129,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
   }
 
   ngOnDestroy() {
-    this.modal.hide();
+    if (this.modal !== undefined) this.modal.hide();
   }
 
   /**

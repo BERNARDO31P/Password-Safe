@@ -72,7 +72,7 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
   }
 
   ngOnDestroy() {
-    this.modal.hide();
+    if (this.modal !== undefined) this.modal.hide();
   }
 
   /**

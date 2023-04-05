@@ -63,7 +63,7 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
   }
 
   ngOnDestroy() {
-    this.modal.hide();
+    if (this.modal !== undefined) this.modal.hide();
   }
 
   /**
