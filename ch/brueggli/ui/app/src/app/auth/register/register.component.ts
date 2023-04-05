@@ -16,15 +16,18 @@ export class RegisterComponent extends AppComponent {
     {
       email: new FormControl("", [
         Validators.required,
-        Validators.email
+        Validators.email,
+        Validators.maxLength(256)
       ]),
       first_name: new FormControl("", [
         Validators.required,
-        Validators.minLength(4)
+        Validators.minLength(4),
+        Validators.maxLength(128)
       ]),
       last_name: new FormControl("", [
         Validators.required,
-        Validators.minLength(4)
+        Validators.minLength(4),
+        Validators.maxLength(128)
       ]),
       password: new FormControl("", [
         Validators.required,

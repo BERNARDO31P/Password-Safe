@@ -25,7 +25,7 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
     {
       name: new FormControl("", [
         Validators.required,
-        Validators.minLength(8),
+        Validators.minLength(4),
         Validators.maxLength(32)
       ]),
       description: new FormControl("", [

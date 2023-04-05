@@ -23,11 +23,13 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
     ]),
     first_name: new FormControl("", [
       Validators.required,
-      Validators.minLength(4)
+      Validators.minLength(4),
+      Validators.maxLength(128)
     ]),
     last_name: new FormControl("", [
       Validators.required,
-      Validators.minLength(4)
+      Validators.minLength(4),
+      Validators.maxLength(128)
     ]),
     is_admin: new FormControl(),
     is_suspended: new FormControl()
