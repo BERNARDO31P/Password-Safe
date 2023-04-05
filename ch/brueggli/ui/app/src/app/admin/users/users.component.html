@@ -9,11 +9,11 @@
     <table class="table">
       <thead>
       <tr>
-        <th class="text-nowrap" *ngFor="let key of Object.keys(users.data[0]) | slice:1">
+        <th (click)="updateSorting($event)" role="button" class="text-nowrap" *ngFor="let key of Object.keys(users.data[0]) | slice:1" [attr.data-name]="key">
           {{translation[key]}}
-          <!--<div class="d-inline-block sort">
-            <i class="bi bi-arrow-down"></i>
-          </div>-->
+          <div class="d-inline-block sort">
+            <i class="bi"></i>
+          </div>
         </th>
       </tr>
       </thead>

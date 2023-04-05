@@ -22,8 +22,8 @@
             {{shared.user.first_name + " " + shared.user.last_name}}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a tabindex="-1" class="dropdown-item" routerLink="auth/account">Konto</a></li>
-            <li><a tabindex="-1" class="dropdown-item" (click)="logout()">Abmelden</a></li>
+            <li><a tabindex="-1" class="dropdown-item" role="button" routerLink="auth/account">Konto</a></li>
+            <li><a tabindex="-1" class="dropdown-item" role="button" (click)="logout()">Abmelden</a></li>
           </ul>
         </li>
         <ng-template #loggedOut>

@@ -293,7 +293,7 @@ export class AppComponent implements AfterViewInit {
 
     this.searching = Boolean(input.value);
 
-    this.request("GET", endpoint + input.value).then(response => {
+    this.request("GET", endpoint + input.value, null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
       callback(response);
     });
   }

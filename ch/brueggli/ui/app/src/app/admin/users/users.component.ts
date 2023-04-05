@@ -9,6 +9,7 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {User} from "src/assets/js/model/User";
 import {SecretKey} from "src/assets/js/model/SecretKey";
 import {Organization} from "src/assets/js/model/Organization";
+import {Sorting} from "src/assets/js/model/Sorting";
 
 @Component({
   selector: "admin-users",
@@ -93,7 +94,7 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
    * Lädt die benötigten Daten für die Darstellung der Benutzerliste.
    */
   protected loadData() {
-    this.request("GET", this.API_HOST + "/admin/users", null, {page: this.shared.page}).then(response => {
+    this.request("GET", this.API_HOST + "/admin/users", null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
       if (response.status === "success") {
         this.users = response.data;
       }
@@ -253,5 +254,36 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
     let id = context.dataset["id"];
 
     this.router.navigateByUrl(location.pathname + "/" + route + "/" + id);
+  }
+
+  protected updateSorting(event: Event): void {
+    let tableHeader = event.currentTarget as HTMLTableCellElement;
+    let tableRow = tableHeader.closest("tr") as HTMLTableRowElement;
+    let clicked = tableHeader.querySelector(".bi") as HTMLSpanElement;
+
+    let icons = tableRow.querySelectorAll(".bi");
+
+    this.shared.sorting.sort = tableHeader.dataset["name"] as string;
+
+    icons.forEach((icon) => {
+      if (icon !== clicked) icon.classList.remove("bi-arrow-down", "bi-arrow-up");
+    });
+
+    if (clicked.classList.contains("bi-arrow-down")) {
+      clicked.classList.remove("bi-arrow-down");
+      clicked.classList.add("bi-arrow-up");
+
+      this.shared.sorting.order = "asc";
+    } else if (clicked.classList.contains("bi-arrow-up")) {
+      clicked.classList.remove("bi-arrow-up");
+
+      this.shared.sorting = {} as Sorting;
+    } else {
+      clicked.classList.add("bi-arrow-down");
+
+      this.shared.sorting.order = "desc";
+    }
+
+    this.loadData();
   }
 }

@@ -75,6 +75,10 @@ td {
   cursor: default;
 }
 
+th {
+  user-select: none;
+}
+
 [class*="pagination-"] {
   display: inline-flex !important;
 }
@@ -129,10 +133,6 @@ td {
   &.show {
     display: inline-grid;
   }
-}
-
-.dropdown-item {
-  cursor: pointer;
 }
 
 .float-end {
@@ -190,5 +190,6 @@ td {
 }
 
 .sort {
+  min-width: 20px;
   margin-left: 10px;
 }
