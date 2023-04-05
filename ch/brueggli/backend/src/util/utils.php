@@ -31,7 +31,6 @@ function removeArrayKeys(array|object $modify, array $keys): array|object
 		}
 	} else {
 		foreach ($modify as $key => $value) {
-			error_log($value);
 			$modify[$key] = removeArrayKeys(!is_object($value) ? $value : $value->toArray(), $keys);
 		}
 	}
