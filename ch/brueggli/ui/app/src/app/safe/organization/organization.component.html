@@ -65,7 +65,7 @@
           </div>
           <div class="mb-2">
             <label for="description" class="form-label">Beschreibung</label>
-            <input type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description">
+            <textarea type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description"></textarea>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.description, 'maxlength')"> darf maximal {{formGroup.controls.description.getError('maxLength')['requiredLength']}} Zeichen lang sein</span>
           </div>
           <div class="mb-2">

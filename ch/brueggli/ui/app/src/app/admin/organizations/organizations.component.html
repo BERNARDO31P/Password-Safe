@@ -55,14 +55,18 @@
           <div class="mb-3">
             <label for="name" class="form-label">Name</label>
             <input tabindex="0" type="text" class="form-control" id="name" placeholder="Brüggli" formControlName="name" autocomplete="name">
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'required')"> wurde nicht ausgefüllt</span>
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'minlength')"> muss mindestens {{formGroup.controls.name.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'maxlength')"> darf maximal {{formGroup.controls.name.getError('maxlength')['requiredLength']}} Zeichen lang sein</span>
           </div>
           <div class="mb-2">
             <label for="description" class="form-label">Beschreibung</label>
-            <input type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description">
+            <textarea type="text" class="form-control" id="description" placeholder="" formControlName="description" autocomplete="description"></textarea>
+            <span class="error" *ngIf="checkFormControl(formGroup.controls.description, 'maxlength')"> darf maximal {{formGroup.controls.description.getError('maxlength')['requiredLength']}} Zeichen lang sein</span>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-            <button type="submit" class="btn btn-primary">Speichern</button>
+            <button type="submit" [disabled]="!formGroup.valid" class="btn btn-primary">Speichern</button>
           </div>
         </form>
       </div>

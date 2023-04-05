@@ -21,16 +21,20 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
     members: "Mitglieder"
   };
 
-  formGroup = new FormGroup({
-    name: new FormControl("", [
-      Validators.required,
-      Validators.min(8),
-      Validators.max(32)
-    ]),
-    description: new FormControl("", [
-      Validators.max(256)
-    ])
-  });
+  formGroup = new FormGroup(
+    {
+      name: new FormControl("", [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(32)
+      ]),
+      description: new FormControl("", [
+        Validators.maxLength(256)
+      ])
+    },
+    {
+      updateOn: "change"
+    });
 
   declare organizations: { data: Array<Organization>, count?: number };
   organization: Organization = {} as Organization;

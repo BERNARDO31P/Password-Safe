@@ -2,7 +2,7 @@
 <form [formGroup]="formGroup" (ngSubmit)="save()">
   <div class="mb-3">
     <label for="password_current" class="form-label">Derzeitiges Passwort</label>
-    <input type="password" class="form-control" id="password_current" placeholder="***********" formControlName="password_current" autocomplete="current-password">
+    <input tabindex="0" type="password" class="form-control" id="password_current" placeholder="***********" formControlName="password_current" autocomplete="current-password">
   </div>
   <div class="mb-3">
     <label for="password" class="form-label">Passwort</label>
