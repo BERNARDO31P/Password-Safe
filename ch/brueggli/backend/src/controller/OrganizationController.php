@@ -115,19 +115,19 @@ class OrganizationController extends AdminController
 
 
 	/**
-	 * Gibt alle Mitglieder einer Organisation anhand ihrer ID zurück.
+	 * Gibt alle Schlüssel einer Organisation anhand ihrer ID zurück.
 	 * @param int $id Die Organisations-ID
 	 * @return void
 	 * @throws Exception Siehe DataRepo
 	 */
-	#[NoReturn] public function getOrganizationMembers(int $id): void
+	#[NoReturn] public function getOrganizationKeys(int $id): void
 	{
 		$page = intval($_GET["page"] ?? 1);
-		$members = DataRepo::of(Member::class)->getByFieldPaged($page - 1, "org_id", $id);
+		$secret_keys = DataRepo::of(SecretKey::class)->getByFieldPaged($page - 1, "org_id", $id);
 
 		$org = $this->_getOrganization($id);
 		$this->writeLog("Auslesen aller Mitglieder der Organisation {org_name}", ["org_name" => $org->name]);
-		$this->sendResponse("success", $members);
+		$this->sendResponse("success", $secret_keys);
 	}
 
 	/**

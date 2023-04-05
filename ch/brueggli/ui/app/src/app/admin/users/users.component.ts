@@ -195,31 +195,30 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
    */
   protected async addOrganizationsKey(keyPage: number = 1): Promise<void> {
     let response = await this.request("GET", this.API_HOST + "/admin/organizations/key", null, {page: keyPage});
-    if (response.status === "success") {
-      if (!response.data.data.length) return;
+    if (response.status !== "success" || !response.data.data.length) return;
 
-      keyPage++;
+    keyPage++;
 
-      let public_key = await CryptUtils.getPublicKey(this.user.public_key as string);
+    let public_key = await CryptUtils.getPublicKey(this.user.public_key as string);
 
-      let secret_keys = [];
-      for (let secret_key_admin of response.data.data as Array<SecretKey>) {
-        let secret_key = await CryptUtils.decryptSecretKey(secret_key_admin.data as string, this.shared.user.private_key as CryptoKey);
-        let data = await CryptUtils.encryptSecretKey(secret_key, public_key);
+    let count = response.data.data.length;
+    let secret_keys = [];
+    for (let secret_key_admin of response.data.data as Array<SecretKey>) {
+      let secret_key = await CryptUtils.decryptSecretKey(secret_key_admin.data as string, this.shared.user.private_key as CryptoKey);
+      let data = await CryptUtils.encryptSecretKey(secret_key, public_key);
 
-        let encrypted = {
-          user_id: this.user.user_id,
-          org_id: secret_key_admin.org_id,
-          data: data,
-          sign: await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey),
-        } as SecretKey;
+      let encrypted = {
+        user_id: this.user.user_id,
+        org_id: secret_key_admin.org_id,
+        data: data,
+        sign: await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey),
+      } as SecretKey;
 
-        secret_keys.push(encrypted);
-      }
-
-      response = await this.request("POST", this.API_HOST + "/admin/organizations/key", JSON.stringify({secret_keys: secret_keys}));
-      if (response.status === "success") await this.addOrganizationsKey(keyPage);
+      secret_keys.push(encrypted);
     }
+
+    response = await this.request("POST", this.API_HOST + "/admin/organizations/key", JSON.stringify({secret_keys: secret_keys}));
+    if (response.status === "success" && count === this.PAGE_COUNT) await this.addOrganizationsKey(keyPage);
   }
 
   /**
@@ -229,18 +228,18 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
    */
   protected async renewOrganizationsKeys(organizationPage: number = 1): Promise<void> {
     let response = await this.request("GET", this.API_HOST + "/admin/organizations", null, {page: organizationPage})
-    if (response.status === "success") {
-      if (!response.data.data.length) return
+    if (response.status !== "success" || !response.data.data.length) return;
 
-      organizationPage++;
+    organizationPage++;
 
-      for (let organization of response.data.data as Array<Organization>) {
-        let secret_key = await CryptUtils.generateSecretKey();
-        await this.updateOrganizationData(organization.org_id!, secret_key);
-        await this.updateOrganizationMembers(organization.org_id!, secret_key);
-      }
-      await this.renewOrganizationsKeys(organizationPage);
+    let count = response.data.data.length;
+    for (let organization of response.data.data as Array<Organization>) {
+      let secret_key = await CryptUtils.generateSecretKey();
+      await this.updateOrganizationData(organization.org_id!, secret_key);
+      await this.updateOrganizationMembers(organization.org_id!, secret_key);
     }
+
+    if (count === this.PAGE_COUNT) await this.renewOrganizationsKeys(organizationPage);
   }
 
   /**

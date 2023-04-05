@@ -53,6 +53,7 @@ export class AdminComponent extends AppComponent {
 
     passwordPage++;
 
+    let count = response.data.data.length;
     let passwords = [];
     for (let password of response.data.data as Array<Password>) {
       let decrypted = await CryptUtils.decryptData(password.data as string, secret_key_old);
@@ -65,7 +66,7 @@ export class AdminComponent extends AppComponent {
     }
 
     response = await this.request("PATCH", this.API_HOST + "/safe/" + org_id, JSON.stringify({passwords: passwords}));
-    if (response.status === "success") await this.updateData(org_id, secret_key, secret_key_old, passwordPage);
+    if (response.status === "success" && count === this.PAGE_COUNT) await this.updateData(org_id, secret_key, secret_key_old, passwordPage);
   }
 
   /**
@@ -76,16 +77,17 @@ export class AdminComponent extends AppComponent {
    * @returns {Promise<void>} - Ein Promise, das zurückgegeben wird, wenn die Aktualisierung der Mitglieder abgeschlossen ist.
    */
   protected async updateOrganizationMembers(org_id: number, secret_key: CryptoKey, memberPage: number = 1): Promise<void> {
-    let response = await this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/members", null, {page: memberPage});
+    let response = await this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/keys", null, {page: memberPage});
     if (response.status !== "success" || !response.data.data.length) return;
 
     memberPage++;
 
+    let count = response.data.data.length;
     let secret_keys = [];
-    for (let member of response.data.data as Array<Member>) {
-      let response = await this.request("GET", this.API_HOST + "/admin/user/" + member.user_id + "/key");
+    for (let secret_key_member of response.data.data as Array<SecretKey>) {
+      let response = await this.request("GET", this.API_HOST + "/admin/user/" + secret_key_member.user_id + "/key");
       if (response.status !== "success") {
-        this.showMessage("Erfolgreich alle Schlüssel erneuert", "success");
+        this.showMessage("Fehler! Bitte kontaktieren Sie einen Systemadministrator", "error");
         return;
       }
 
@@ -93,7 +95,7 @@ export class AdminComponent extends AppComponent {
       let data = await CryptUtils.encryptSecretKey(secret_key as CryptoKey, public_key)
 
       let encrypted = {
-        user_id: member.user_id,
+        user_id: secret_key_member.user_id,
         org_id: org_id,
         data: data,
         sign: await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey),
@@ -103,7 +105,7 @@ export class AdminComponent extends AppComponent {
     }
 
     response = await this.request("PATCH", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
-    if (response.status === "success") await this.updateOrganizationMembers(org_id, secret_key, memberPage);
+    if (response.status === "success" && count === this.PAGE_COUNT) await this.updateOrganizationMembers(org_id, secret_key, memberPage);
   }
 
   /**

@@ -97,8 +97,8 @@ $router->mount("/admin", function () use ($router) {
 		$router->delete("/member", "OrganizationController@deleteOrganizationMember");
 
 		$router->mount("/{id}", function () use ($router) {
+			$router->get("/keys", "OrganizationController@getOrganizationKeys");
 			$router->get("/key", "OrganizationController@getOrganizationKey");
-			$router->get("/members", "OrganizationController@getOrganizationMembers");
 
 			$router->patch("/", "OrganizationController@editOrganization");
 
