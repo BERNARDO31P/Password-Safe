@@ -14,13 +14,11 @@
       </thead>
       <tbody>
         <tr (contextmenu)="updateContext($event)" *ngFor="let user of users.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: users.count}" [attr.data-id]="user.user_id">
-          <td>{{user.email}}</td>
-          <td>{{user.first_name}}</td>
-          <td>{{user.last_name}}</td>
-          <td>{{user.is_admin | yesNo}}</td>
-          <td>{{user.is_suspended | yesNo}}</td>
-          <td *ngIf="user.last_login">{{user.last_login * 1000 | date: "dd.MM.yyyy - HH:mm"}}</td>
-          <td *ngIf="!user.last_login">Keine Anmeldung</td>
+          <td class="text-truncate" *ngFor="let value of Object.values(user) | slice:1: 4">{{value}}</td>
+          <td class="text-truncate">{{user.is_admin | yesNo}}</td>
+          <td class="text-truncate">{{user.is_suspended | yesNo}}</td>
+          <td class="text-truncate" *ngIf="user.last_login">{{user.last_login * 1000 | date: "dd.MM.yyyy - HH:mm"}}</td>
+          <td class="text-truncate" *ngIf="!user.last_login">Keine Anmeldung</td>
         </tr>
       </tbody>
     </table>

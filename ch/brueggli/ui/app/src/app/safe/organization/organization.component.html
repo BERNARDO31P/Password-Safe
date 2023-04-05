@@ -19,9 +19,9 @@
       </thead>
       <tbody>
         <tr (contextmenu)="updateContext($event)" *ngFor="let password of passwords.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: passwords.count}" [attr.data-id]="password.pass_id">
-          <td>{{password.name}}</td>
-          <td>{{password.description}}</td>
-          <td>{{getAccount(password.data)}}</td>
+          <td class="text-truncate">{{password.name}}</td>
+          <td class="text-truncate">{{password.description}}</td>
+          <td class="text-truncate">{{getAccount(password.data)}}</td>
         </tr>
       </tbody>
     </table>

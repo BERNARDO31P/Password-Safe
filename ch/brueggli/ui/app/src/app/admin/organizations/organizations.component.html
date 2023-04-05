@@ -17,7 +17,7 @@
       </thead>
       <tbody>
         <tr (contextmenu)="updateContext($event)" *ngFor="let org of organizations.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: organizations.count}" [attr.data-id]="org.org_id">
-          <td *ngFor="let value of Object.values(org) | slice:1: 3">{{value}}</td>
+          <td class="text-truncate" *ngFor="let value of Object.values(org) | slice:1: 3">{{value}}</td>
         </tr>
       </tbody>
     </table>
