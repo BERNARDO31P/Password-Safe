@@ -2,7 +2,7 @@
 <form [formGroup]="formGroup" (ngSubmit)="register()">
   <div class="mb-2">
     <label for="email" class="form-label">Email-Adresse</label>
-    <input type="email" [ngClass]="{'error': checkFormControl(formGroup.controls.email)}" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
+    <input tabindex="0" type="email" [ngClass]="{'error': checkFormControl(formGroup.controls.email)}" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
     <span class="error" *ngIf="checkFormControl(formGroup.controls.email, 'required')"> wurde nicht ausgefüllt</span>
     <span class="error" *ngIf="checkFormControl(formGroup.controls.email, 'email')"> ist ungültig: hans.muster@beispiel.ch</span>
   </div>

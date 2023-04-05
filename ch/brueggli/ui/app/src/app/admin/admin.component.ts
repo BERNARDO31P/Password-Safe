@@ -56,7 +56,10 @@ export class AdminComponent extends AppComponent {
     let passwords = [];
     for (let password of response.data.data as Array<Password>) {
       let decrypted = await CryptUtils.decryptData(password.data as string, secret_key_old);
-      password.data = await CryptUtils.encryptData(decrypted, secret_key);
+      let data = await CryptUtils.encryptData(decrypted, secret_key);
+
+      password.data = data;
+      password.sign = await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey);
 
       passwords.push(password);
     }
@@ -87,14 +90,16 @@ export class AdminComponent extends AppComponent {
       }
 
       let public_key = await CryptUtils.getPublicKey(response.data.public_key);
+      let data = await CryptUtils.encryptSecretKey(secret_key as CryptoKey, public_key)
 
-      let secret_key_encrypted = {
+      let encrypted = {
         user_id: member.user_id,
         org_id: org_id,
-        secret_key: await CryptUtils.encryptSecretKey(secret_key as CryptoKey, public_key)
+        data: data,
+        sign: await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey),
       } as SecretKey;
 
-      secret_keys.push(secret_key_encrypted);
+      secret_keys.push(encrypted);
     }
 
     response = await this.request("PATCH", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
@@ -111,7 +116,7 @@ export class AdminComponent extends AppComponent {
     let response = await this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/key");
     if (response.status !== "success") return;
 
-    let secret_key_old = await CryptUtils.decryptSecretKey(response.data.secret_key, this.shared.user.private_key as CryptoKey);
+    let secret_key_old = await CryptUtils.decryptSecretKey(response.data.data, this.shared.user.private_key as CryptoKey);
 
     await this.updateData(org_id, secret_key, secret_key_old);
   }

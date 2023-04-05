@@ -336,22 +336,25 @@ export class CryptUtils {
    * Gibt ein assoziatives Array zurück, das die Benutzer-IDs als Schlüssel und die Base64-kodierten Schlüssel als Werte enthält.
    * @param {Array<User>} users Ein Array von Benutzern, deren öffentliche Schlüssel zur Verschlüsselung der geheimen Schlüssel verwendet werden sollen.
    * @param {number} org_id Die ID der Organisation, für welche die geheimen Schlüssel generiert werden sollen.
+   * @param {CryptoKey} sign_private_key Der private Schlüssel, der zum Signieren der verschlüsselten Daten verwendet werden soll.
    * @return {Promise<Record<number, string>>} Ein assoziatives Array, das die Benutzer-IDs als Schlüssel und die Base64-kodierten geheimen Schlüssel als Werte enthält.
    */
-  static async generateSecretKeys(users: Array<User>, org_id: number): Promise<Array<SecretKey>> {
+  static async generateSecretKeys(users: Array<User>, org_id: number, sign_private_key: CryptoKey): Promise<Array<SecretKey>> {
     let secret_key = await this.generateSecretKey();
     let secret_keys = [] as Array<SecretKey>;
 
     for (let user of users) {
       let public_key = await this.getPublicKey(user.public_key as string);
+      let data = await this.encryptSecretKey(secret_key, public_key as CryptoKey);
 
-      let secret_key_entry = {
-        secret_key: await this.encryptSecretKey(secret_key, public_key as CryptoKey),
+      let encrypted = {
         user_id: user.user_id,
-        org_id: org_id
+        org_id: org_id,
+        data: data,
+        sign: await CryptUtils.signData(data, sign_private_key),
       } as SecretKey;
 
-      secret_keys.push(secret_key_entry);
+      secret_keys.push(encrypted);
     }
 
     return secret_keys;

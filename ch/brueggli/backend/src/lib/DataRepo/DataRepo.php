@@ -471,8 +471,6 @@ class DataRepo
 					throw new Exception("Error encoding value for key " . $key);
 				}
 				$keyVal[$key] = $encoded;
-			} elseif (empty($val) && !is_int($val)) {
-				unset($keyVal[$key]);
 			}
 		}
 	}

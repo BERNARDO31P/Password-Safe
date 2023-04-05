@@ -1,19 +1,19 @@
-<nav class="navbar navbar-expand-lg bg-light">
+<nav tabindex="-1" class="navbar navbar-expand-lg bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" routerLink="home">{{pageName}}</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBody" aria-controls="navbarBody" aria-expanded="false" aria-label="Toggle navigation">
+    <a tabindex="-1" class="navbar-brand" routerLink="home">{{pageName}}</a>
+    <button tabindex="-1" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBody" aria-controls="navbarBody" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarBody">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" routerLink="home">Startseite</a>
+          <a tabindex="-1" class="nav-link" routerLink="home">Startseite</a>
         </li>
         <li class="nav-item" *ngIf="shared.user.user_id">
-          <a class="nav-link" routerLink="safe">Tresor</a>
+          <a tabindex="-1" class="nav-link" routerLink="safe">Tresor</a>
         </li>
         <li class="nav-item" *ngIf="shared.user.is_admin">
-          <a class="nav-link" routerLink="admin">Admin Center</a>
+          <a tabindex="-1" class="nav-link" routerLink="admin">Admin Center</a>
         </li>
       </ul>
       <ul class="navbar-nav ml-auto">
@@ -22,16 +22,16 @@
             {{shared.user.first_name + " " + shared.user.last_name}}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" routerLink="auth/account">Konto</a></li>
-            <li><a class="dropdown-item" (click)="logout()">Abmelden</a></li>
+            <li><a tabindex="-1" class="dropdown-item" routerLink="auth/account">Konto</a></li>
+            <li><a tabindex="-1" class="dropdown-item" (click)="logout()">Abmelden</a></li>
           </ul>
         </li>
         <ng-template #loggedOut>
           <li class="nav-item">
-            <a class="nav-link" routerLink="auth/login">Anmelden</a>
+            <a tabindex="-1" class="nav-link" routerLink="auth/login">Anmelden</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="auth/register">Registrieren</a>
+            <a tabindex="-1" class="nav-link" routerLink="auth/register">Registrieren</a>
           </li>
         </ng-template>
       </ul>

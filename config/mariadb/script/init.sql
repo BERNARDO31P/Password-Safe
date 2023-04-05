@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS organizations
 CREATE TABLE IF NOT EXISTS secret_keys
 (
     secret_id  INTEGER PRIMARY KEY AUTO_INCREMENT,
-    secret_key VARCHAR(512) NOT NULL,
+    data VARCHAR(512) NOT NULL,
 
     user_id    INTEGER      NOT NULL,
     org_id     INTEGER      NOT NULL,

@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
+import {Component, ElementRef, OnDestroy, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 import RandExp from "randexp";
@@ -19,7 +19,7 @@ import {Credentials} from "src/assets/js/model/Credentials";
   templateUrl: "./organization.component.html",
   styleUrls: ["./organization.component.scss"]
 })
-export class SafeOrganizationComponent extends SafeComponent {
+export class SafeOrganizationComponent extends SafeComponent implements OnDestroy {
   translation: Record<string, string> = {
     pass_id: "Passwort ID",
     name: "Name",
@@ -94,9 +94,7 @@ export class SafeOrganizationComponent extends SafeComponent {
 
           this.request("GET", this.API_HOST + "/safe/" + id + "/key").then(async response => {
             if (response.status === "success") {
-              let encrypted = response.data.secret_key;
-
-              this.secret_key = await CryptUtils.decryptSecretKey(encrypted, this.shared.user.private_key as CryptoKey);
+              this.secret_key = await CryptUtils.decryptSecretKey(response.data.data, this.shared.user.private_key as CryptoKey);
 
               for (let password of this.passwords.data) {
                 password.data = await CryptUtils.decryptData(password.data as string, this.secret_key);
@@ -128,6 +126,30 @@ export class SafeOrganizationComponent extends SafeComponent {
     if (this.modalRef !== undefined) {
       this.modal = new Modal(this.modalRef.nativeElement);
     }
+  }
+
+  ngOnDestroy() {
+    this.modal.hide();
+  }
+
+  /**
+   * Führt die Methode auf der Basisklasse aus.
+   * Zeigt den Knopf zum Öffnen der URL nur an, wenn eine URL vorhanden ist.
+   * @param {MouseEvent} event Das Auslöser-Event.
+   */
+  protected override updateContext(event: MouseEvent) {
+    super.updateContext(event, (id, context) => {
+      let index = this.passwords.data.findIndex(password => password.pass_id === id);
+      let password = this.passwords.data[index];
+
+      let openURL = context.querySelector("#openURL") as HTMLButtonElement;
+
+      if (password.url === '') {
+        openURL.classList.add("hidden");
+      } else {
+        openURL.classList.remove("hidden");
+      }
+    });
   }
 
   /**
@@ -203,6 +225,7 @@ export class SafeOrganizationComponent extends SafeComponent {
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
 
     let password = structuredClone(this.formGroup.value) as Password;
+
     password.org_id = org_id;
     password.pass_id = id;
 
@@ -279,7 +302,7 @@ export class SafeOrganizationComponent extends SafeComponent {
     let index = this.passwords.data.findIndex(password => password.pass_id === id);
     let password = this.passwords.data[index];
 
-    if (!password.url) {
+    if (password.url === '') {
       this.showMessage("Bei diesem Passwort wurde keine URL hinterlegt", "error");
       return;
     }

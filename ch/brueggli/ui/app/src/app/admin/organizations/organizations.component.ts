@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
+import {AfterViewChecked, Component, ElementRef, OnDestroy, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import Modal from "bootstrap/js/dist/modal";
 
@@ -13,7 +13,7 @@ import {Organization} from "src/assets/js/model/Organization";
   templateUrl: "./organizations.component.html",
   styleUrls: ["./organizations.component.scss"]
 })
-export class OrganizationsComponent extends AdminComponent {
+export class OrganizationsComponent extends AdminComponent implements AfterViewChecked, OnDestroy {
   translation: Record<string, string> = {
     org_id: "Organisation ID",
     name: "Name",
@@ -40,6 +40,10 @@ export class OrganizationsComponent extends AdminComponent {
 
   declare private modal: Modal;
 
+  /**
+   * Funktion, die nach der Initialisierung der Komponente aufgerufen wird.
+   * Lädt die Daten und verarbeitet diese.
+   */
   override ngAfterViewInit() {
     super.ngAfterViewInit();
 
@@ -47,8 +51,15 @@ export class OrganizationsComponent extends AdminComponent {
       this.modal = new Modal(this.modalRef.nativeElement);
     }
 
-    this.setLocation("Organisationen");
     this.loadData();
+  }
+
+  ngAfterViewChecked() {
+    this.setLocation("Organisationen");
+  }
+
+  ngOnDestroy() {
+    this.modal.hide();
   }
 
   /**
@@ -120,7 +131,7 @@ export class OrganizationsComponent extends AdminComponent {
           new Promise<void>((resolve) => {
             this.request("GET", this.API_HOST + "/admin/users/admins").then(async response => {
               if (response.status === "success") {
-                let secret_keys = await CryptUtils.generateSecretKeys(response.data, org_id);
+                let secret_keys = await CryptUtils.generateSecretKeys(response.data, org_id, this.shared.user.sign_private_key as CryptoKey);
 
                 await this.request("POST", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
                 resolve();

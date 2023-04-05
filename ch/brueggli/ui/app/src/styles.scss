@@ -37,6 +37,10 @@ button:not([class*="btn-"]):not(#sidebar-open) {
   &:hover {
     background-color: #e5e5e5 !important;
   }
+
+  &:focus-visible {
+    border: 1px solid #5c5c5c !important;
+  }
 }
 
 tbody > tr {

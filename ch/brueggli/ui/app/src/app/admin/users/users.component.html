@@ -52,13 +52,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Verwaltung des Benutzers</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button tabindex="-1" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form [formGroup]="formGroup" (ngSubmit)="save()">
           <div class="mb-3">
             <label for="email" class="form-label">Email-Adresse</label>
-            <input type="email" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
+            <input tabindex="0" type="email" class="form-control" id="email" placeholder="name@beispiel.de" formControlName="email" autocomplete="email">
           </div>
           <div class="mb-2">
             <label for="first_name" class="form-label">Vorname</label>

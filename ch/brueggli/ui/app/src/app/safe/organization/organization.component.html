@@ -43,7 +43,7 @@
 </ng-template>
 <div id="contextmenu" #context>
   <button class="btn" (click)="copyPassword()">Passwort kopieren</button>
-  <button class="btn" (click)="openURL()">URL öffnen</button>
+  <button id="openURL" class="btn" (click)="openURL()">URL öffnen</button>
   <button class="btn" (click)="edit()">Bearbeiten</button>
   <button class="btn" (click)="delete()">Löschen</button>
 </div>
@@ -53,13 +53,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Verwaltung des Passworts</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button tabindex="-1" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form [formGroup]="formGroup" (ngSubmit)="save()">
           <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" placeholder="Brüggli vSphere Admin" formControlName="name" autocomplete="name">
+            <input tabindex="0" type="text" class="form-control" id="name" placeholder="Brüggli vSphere Admin" formControlName="name" autocomplete="name">
             <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'required')"> wurde nicht ausgefüllt</span>
             <span class="error" *ngIf="checkFormControl(formGroup.controls.name, 'minlength')"> muss mindestens {{formGroup.controls.name.getError('minlength')['requiredLength']}} Zeichen lang sein</span>
           </div>
@@ -84,8 +84,8 @@
               <label for="password" class="form-label">Passwort</label>
               <div class="d-flex">
                 <input type="password" class="form-control d-inline" id="password" placeholder="" formControlName="password" autocomplete="new-password">
-                <button type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
-                <button type="button" class="btn" (click)="generatePassword()"><i class="bi bi-arrow-repeat"></i></button>
+                <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+                <button tabindex="-1" type="button" class="btn" (click)="generatePassword()"><i class="bi bi-arrow-repeat"></i></button>
               </div>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'required')"> wurde nicht ausgefüllt</span>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password, 'minlength')"> muss mindestens {{formGroup.controls.data.controls.password.getError('minlength')['requiredLength']}}
@@ -96,7 +96,7 @@
               <label for="password_repeat" class="form-label">Passwort wiederholen</label>
               <div class="d-flex">
                 <input type="password" class="form-control" id="password_repeat" placeholder="" formControlName="password_repeat" autocomplete="new-password">
-                <button type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
+                <button tabindex="-1" type="button" class="btn in-input" (click)="togglePassword($event)"><i class="bi bi-eye"></i></button>
               </div>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password_repeat, 'required')"> wurde nicht ausgefüllt</span>
               <span class="error" *ngIf="checkFormControl(formGroup.controls.data.controls.password_repeat, 'matching')"> passwörter stimmen nicht überein</span>

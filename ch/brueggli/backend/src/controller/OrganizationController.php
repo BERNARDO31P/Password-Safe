@@ -46,6 +46,8 @@ class OrganizationController extends AdminController
 
 		$secret_key = SecretKey::fromObj($_POST["secret_key"]);
 
+		$this->checkSignature($secret_key->data, $secret_key->sign);
+
 		$entries = DataRepo::of(SecretKey::class)->getByFields([
 			"user_id" => $secret_key->user_id,
 			"org_id" => $secret_key->org_id
@@ -69,6 +71,8 @@ class OrganizationController extends AdminController
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
+			$this->checkSignature($secret_key->data, $secret_key->sign);
+
 			$org = $this->_getOrganization($secret_key->org_id);
 			if (!DataRepo::insert($secret_key)) {
 				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);
@@ -88,6 +92,7 @@ class OrganizationController extends AdminController
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
+			$this->checkSignature($secret_key->data, $secret_key->sign);
 
 			$secret_key_old = DataRepo::of(SecretKey::class)->getByFields([
 				"user_id" => $secret_key->user_id,
@@ -209,9 +214,8 @@ class OrganizationController extends AdminController
 	}
 
 	/**
-	 *
 	 * Speichert die symmetrischen Schlüssel des Benutzers für Organisationen.
-	 * @throws Exception Wenn beim Speichern eines symmetrischen Schlüssels ein Fehler auftritt.
+	 * @throws Exception Die symmetrischen Schlüssel konnten nicht gesetzt werden.
 	 * @return void
 	 */
 	#[NoReturn] public function setOrganizationsKey(): void
@@ -220,6 +224,8 @@ class OrganizationController extends AdminController
 
 		foreach ($_POST["secret_keys"] as $secret_key) {
 			$secret_key = SecretKey::fromObj($secret_key);
+			$this->checkSignature($secret_key->data, $secret_key->sign);
+
 			if (!DataRepo::insert($secret_key)) {
 				$org = $this->_getOrganization($secret_key->org_id);
 				$this->sendResponse("error", null, "Beim Bearbeiten von der Organisation {org_name} ist ein Fehler aufgetreten", ["org_name" => $org->name], 500);

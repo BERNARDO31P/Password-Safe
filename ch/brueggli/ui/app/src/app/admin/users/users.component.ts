@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
+import {AfterViewChecked, Component, ElementRef, OnDestroy, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import Modal from "bootstrap/js/dist/modal";
 
@@ -15,7 +15,7 @@ import {Organization} from "src/assets/js/model/Organization";
   templateUrl: "./users.component.html",
   styleUrls: ["./users.component.scss"]
 })
-export class UsersComponent extends AdminComponent {
+export class UsersComponent extends AdminComponent implements AfterViewChecked, OnDestroy {
   formGroup = new FormGroup({
     email: new FormControl("", [
       Validators.required,
@@ -64,8 +64,15 @@ export class UsersComponent extends AdminComponent {
       this.modal = new Modal(this.modalRef.nativeElement);
     }
 
-    this.setLocation("Benutzer");
     this.loadData();
+  }
+
+  ngAfterViewChecked() {
+    this.setLocation("Benutzer");
+  }
+
+  ngOnDestroy() {
+    this.modal.hide();
   }
 
   /**
@@ -195,15 +202,17 @@ export class UsersComponent extends AdminComponent {
 
       let secret_keys = [];
       for (let secret_key_admin of response.data.data as Array<SecretKey>) {
-        let secret_key = await CryptUtils.decryptSecretKey(secret_key_admin.secret_key as string, this.shared.user.private_key as CryptoKey);
+        let secret_key = await CryptUtils.decryptSecretKey(secret_key_admin.data as string, this.shared.user.private_key as CryptoKey);
+        let data = await CryptUtils.encryptSecretKey(secret_key, public_key);
 
-        let secret_key_user = {
+        let encrypted = {
           user_id: this.user.user_id,
           org_id: secret_key_admin.org_id,
-          secret_key: await CryptUtils.encryptSecretKey(secret_key, public_key),
+          data: data,
+          sign: await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey),
         } as SecretKey;
 
-        secret_keys.push(secret_key_user);
+        secret_keys.push(encrypted);
       }
 
       response = await this.request("POST", this.API_HOST + "/admin/organizations/key", JSON.stringify({secret_keys: secret_keys}));

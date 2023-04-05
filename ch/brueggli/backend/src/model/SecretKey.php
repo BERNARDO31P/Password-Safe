@@ -18,7 +18,9 @@ class SecretKey implements JsonSerializable
 	#[db_column]
 	public ?int $secret_id = null;
 	#[db_column]
-	public string $secret_key = "";
+	public string $data = "";
+
+	public string $sign = "";
 
 	#[db_column, db_foreign_key(User::class)]
 	public int $user_id = 0;

@@ -74,6 +74,7 @@ class SafeController extends AdminController
 			$password = Password::fromObj($password);
 
 			$this->checkSafeAllowance($password->org_id);
+			$this->checkSignature($password->data, $password->sign);
 
 			if (!DataRepo::update($password)) {
 				$this->sendResponse("error", null, "Beim Aktualisieren der Passwörter ist ein Fehler aufgetreten", null, 500);
@@ -112,6 +113,7 @@ class SafeController extends AdminController
 		$this->checkSafeAllowance($_POST["org_id"]);
 
 		$password = Password::fromObj($_POST);
+		$this->checkSignature($password->data, $password->sign);
 
 		if (!DataRepo::update($password)) {
 			$this->sendResponse("error", null, "Beim Aktualisieren des Passworts ist ein Fehler aufgetreten", null, 500);
