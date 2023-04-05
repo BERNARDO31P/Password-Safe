@@ -142,11 +142,12 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
         let member_index = this.userOrganizations.findIndex(member => member.org_id === org_id);
         this.userOrganizations.splice(member_index, 1);
 
-        this.showLoading();
         if (!this.user.is_admin) {
+          this.showLoading();
           await this.renewOrganizationKeys(org_id);
-          this.showMessage(response.message, response.status);
         }
+
+        this.showMessage(response.message, response.status);
       }
     });
   }
