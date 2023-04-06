@@ -12,7 +12,10 @@
         <th (click)="updateSorting($event)" role="button" class="text-nowrap" *ngFor="let key of Object.keys(users.data[0]) | slice:1" [attr.data-name]="key">
           {{translation[key]}}
           <div class="d-inline-block sort">
-            <i class="bi"></i>
+            <i [ngClass]="{
+            'bi-arrow-down': (key === shared.sorting.sort && shared.sorting.order === 'ASC'),
+            'bi-arrow-up': (key === shared.sorting.sort && shared.sorting.order === 'DESC')
+            }" class="bi"></i>
           </div>
         </th>
       </tr>
@@ -29,7 +32,7 @@
     </table>
   </div>
   <div class="text-center mt-2" *ngIf="users.count! / PAGE_COUNT > 1">
-    <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}"></pagination-controls>
+    <pagination-controls (pageChange)="shared.page = $event; loadData()" routerLink="." [queryParams]="{page: shared.page}" [queryParamsHandling]="'merge'"></pagination-controls>
   </div>
 </ng-container>
 

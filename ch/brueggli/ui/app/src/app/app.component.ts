@@ -9,7 +9,6 @@ import {SharedService} from "src/assets/js/shared.service";
 import {CryptUtils} from "src/assets/js/crypt_utils";
 
 import {User} from "src/assets/js/model/User";
-import {Sorting} from "../assets/js/model/Sorting";
 
 
 export type Response = {
@@ -325,20 +324,20 @@ export class AppComponent implements AfterViewInit {
     } else if (clicked.classList.contains("bi-arrow-up")) {
       clicked.classList.remove("bi-arrow-up");
 
-      this.shared.sorting = {} as Sorting;
+      this.shared.sorting = {sort: null, order: null};
     } else {
       clicked.classList.add("bi-arrow-down");
 
       this.shared.sorting.order = "ASC";
     }
 
-    /*this.router.navigate(
+    this.router.navigate(
       [],
       {
         relativeTo: this.route,
-        queryParams: {...this.shared.sorting, this.shared.page},
-        queryParamsHandling: 'merge', // remove to replace all query params by provided
-      });*/
+        queryParams: this.shared.sorting,
+        queryParamsHandling: "merge"
+      });
 
     callback();
   }

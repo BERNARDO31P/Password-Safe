@@ -1,4 +1,4 @@
 export type Sorting = {
-  sort: string,
-  order: string,
+  sort: string | null,
+  order: string | null,
 }
