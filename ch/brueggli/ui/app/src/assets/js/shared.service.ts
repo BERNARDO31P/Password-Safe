@@ -26,6 +26,8 @@ export class SharedService {
   constructor(private route: ActivatedRoute, private router: Router) {
     this.route.queryParams.subscribe(params => {
       if (params["page"]) this.page = Number(params["page"]);
+      else this.page = 1;
+
       if (params["sort"]) this.sorting.sort = params["sort"];
       if (params["order"]) this.sorting.order = params["order"];
 
@@ -33,9 +35,9 @@ export class SharedService {
         this.previousPage = this.page;
         this.page = 1;
         this.setParams({page: null});
-      } else if (!params["search"] && this.previousPage) {
+      } else if (!params["search"] && this.previousPage !== null) {
         this.setParams({page: this.previousPage});
-        this.page = this.previousPage as number;
+        this.page = this.previousPage;
         this.previousPage = null;
       }
 
