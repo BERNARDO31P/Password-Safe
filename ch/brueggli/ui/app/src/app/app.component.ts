@@ -304,15 +304,9 @@ export class AppComponent implements AfterViewInit {
    */
   protected search(event: Event, endpoint: string, callback: (response: Response) => void) {
     let input = event.currentTarget as HTMLInputElement;
-    this.searching = Boolean(input.value);
 
-    this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: {search: (this.searching) ? input.value : null},
-        queryParamsHandling: "merge"
-      });
+    this.searching = Boolean(input.value);
+    this.shared.setParams({search: (this.searching) ? input.value : null});
 
     setTimeout(() => {
       this.request("GET", endpoint + input.value, null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
@@ -355,13 +349,7 @@ export class AppComponent implements AfterViewInit {
       this.shared.sorting.order = "ASC";
     }
 
-    this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: this.shared.sorting,
-        queryParamsHandling: "merge"
-      });
+    this.shared.setParams(this.shared.sorting);
 
     callback();
   }

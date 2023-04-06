@@ -43,7 +43,7 @@ export class SharedService {
     });
   }
 
-  private setParams(params: object): void {
+  setParams(params: object): void {
     this.router.navigate(
       [],
       {
