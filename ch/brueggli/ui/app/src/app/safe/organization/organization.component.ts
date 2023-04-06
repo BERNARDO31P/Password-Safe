@@ -87,7 +87,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     let index = this.shared.organizations.findIndex(org => org.org_id === id);
 
     if (index !== -1) {
-      this.request("GET", this.API_HOST + "/safe/" + id, null, {page: this.shared.page}).then(response => {
+      this.request("GET", this.API_HOST + "/safe/" + id, null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
         if (response.status === "success") {
           this.passwords = response.data;
           this.organization = this.shared.organizations[index];
@@ -321,6 +321,16 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
       }
     }
     return false;
+  }
+
+  /**
+   * Aktualisiert die Sortierung der Tabelle und lädt die Daten neu.
+   * @param {Event} event Das Event, welches die Sortierung ausgelöst hat
+   */
+  protected override updateSorting(event: Event) {
+    super.updateSorting(event, () => {
+      this.loadData();
+    });
   }
 
   /**

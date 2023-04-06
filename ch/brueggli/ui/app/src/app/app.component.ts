@@ -9,6 +9,7 @@ import {SharedService} from "src/assets/js/shared.service";
 import {CryptUtils} from "src/assets/js/crypt_utils";
 
 import {User} from "src/assets/js/model/User";
+import {Sorting} from "../assets/js/model/Sorting";
 
 
 export type Response = {
@@ -296,6 +297,42 @@ export class AppComponent implements AfterViewInit {
     this.request("GET", endpoint + input.value, null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
       callback(response);
     });
+  }
+
+  /**
+   * Aktualisiert die Sortierung einer Tabelle und führt einen Callback aus.
+   * @param {Event} event Das auslösende Event.
+   * @param callback Die Callback-Funktion, die ausgeführt werden soll.
+   */
+  protected updateSorting(event: Event, callback = () => {}): void {
+    let tableHeader = event.currentTarget as HTMLTableCellElement;
+    let tableRow = tableHeader.closest("tr") as HTMLTableRowElement;
+    let clicked = tableHeader.querySelector(".bi") as HTMLSpanElement;
+
+    let icons = tableRow.querySelectorAll(".bi");
+
+    this.shared.sorting.sort = tableHeader.dataset["name"] as string;
+
+    icons.forEach((icon) => {
+      if (icon !== clicked) icon.classList.remove("bi-arrow-down", "bi-arrow-up");
+    });
+
+    if (clicked.classList.contains("bi-arrow-down")) {
+      clicked.classList.remove("bi-arrow-down");
+      clicked.classList.add("bi-arrow-up");
+
+      this.shared.sorting.order = "DESC";
+    } else if (clicked.classList.contains("bi-arrow-up")) {
+      clicked.classList.remove("bi-arrow-up");
+
+      this.shared.sorting = {} as Sorting;
+    } else {
+      clicked.classList.add("bi-arrow-down");
+
+      this.shared.sorting.order = "ASC";
+    }
+
+    callback();
   }
 
   /**

@@ -23,7 +23,7 @@ table {
   margin-bottom: 0 !important;
 }
 
-button:not([class^="btn-"]):not(#sidebar-open) {
+button:not([class*="btn-"]):not(#sidebar-open) {
   border: unset;
   transition: 0.2s;
 

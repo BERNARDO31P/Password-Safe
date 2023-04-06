@@ -82,7 +82,7 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
    * Lädt die benötigten Daten für die Darstellung der Liste der Organisationen.
    */
   protected loadData() {
-    this.request("GET", this.API_HOST + "/admin/organizations", null, {page: this.shared.page}).then(response => {
+    this.request("GET", this.API_HOST + "/admin/organizations", null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
       if (response.status === "success") {
         this.organizations = response.data;
       }
@@ -172,6 +172,16 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
       if (response.status === "success") {
         this.loadData();
       }
+    });
+  }
+
+  /**
+   * Aktualisiert die Sortierung einer Tabelle und lädt die Daten neu.
+   * @param {Event} event Das Auslöser-Event.
+   */
+  protected override updateSorting(event: Event): void {
+    super.updateSorting(event, () => {
+      this.loadData();
     });
   }
 

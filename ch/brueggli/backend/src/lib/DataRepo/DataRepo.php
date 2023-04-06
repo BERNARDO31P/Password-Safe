@@ -15,6 +15,7 @@ class DataRepo
 	private mixed $class;
 	private static int $page_count = 10;
 	private static string $page_limit;
+	private static array $sorting;
 
 	public static mixed $callback;
 	public static mixed $callbackError;
@@ -39,8 +40,22 @@ class DataRepo
 	 */
 	public static function of(string $class): static
 	{
+		$object = new static($class);
 		static::$page_limit = " LIMIT " . static::$page_count . " OFFSET :page";
-		return new static($class);
+
+		if (isset($_GET["sort"]) && isset($_GET["order"])) {
+			$fields = $object->class::getDbFields();
+			$column = $_GET["sort"];
+			$order = $_GET["order"];
+
+			if (in_array($column, $fields) && in_array($order, ["ASC", "DESC"])) {
+				static::$sorting = ["sort" => $_GET["sort"], "order" => $_GET["order"]];
+				return $object;
+			}
+		}
+
+		static::$sorting = ["sort" => $object->class::PRIMARY_KEY, "order" => "ASC"];
+		return $object;
 	}
 
 	/**
@@ -105,7 +120,8 @@ class DataRepo
 	 */
 	public function getAllPaged(int $page): array
 	{
-		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($this->baseFetchSql() . static::$page_limit);
+		$sql = $this->baseFetchSql() . " ORDER BY " . static::$sorting["sort"] . " " . static::$sorting["order"] . static::$page_limit;
+		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
 
 		$offset = static::$page_count * $page;
 		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
@@ -141,8 +157,8 @@ class DataRepo
 	 */
 	public function getByFieldPaged(int $page, string $field, mixed $value): array|null
 	{
-		$sql = $this->baseFetchSql() . " AND " . $field . " = :" . $field;
-		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql . static::$page_limit);
+		$sql = $this->baseFetchSql() . " AND " . $field . " = :" . $field . " ORDER BY " . static::$sorting["sort"] . " " . static::$sorting["order"] . static::$page_limit;
+		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
 
 		$offset = static::$page_count * $page;
 		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
@@ -185,13 +201,16 @@ class DataRepo
 
 		$searchSQL = " AND " . implode(" OR ", array_map($mapFn, $this->class::getDbFields())) . " AND " . key($id) . " = :value";
 
-		$sql = $this->baseFetchSql() . $searchSQL . static::$page_limit;
+		$sql = $this->baseFetchSql() . $searchSQL . " ORDER BY " . static::$sorting["sort"] . " " . static::$sorting["order"] . static::$page_limit;
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
 
 		$offset = static::$page_count * $page;
 		$value = current($id);
 
 		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
+		$stmt->bindParam("column", static::$sorting["sort"]);
+		$stmt->bindParam("order", static::$sorting["order"]);
+
 		$stmt->bindParam("search", $search);
 		$stmt->bindParam("value", $value);
 

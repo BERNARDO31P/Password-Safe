@@ -12,7 +12,12 @@
     <table class="table">
       <thead>
       <tr>
-        <th class="text-nowrap" *ngFor="let key of Object.keys(organizations.data[0]) | slice: 1: 3">{{translation[key]}}</th>
+        <th (click)="updateSorting($event)" role="button" class="text-nowrap" *ngFor="let key of Object.keys(organizations.data[0]) | slice: 1: 3" [attr.data-name]="key">
+          {{translation[key]}}
+          <div class="d-inline-block sort">
+            <i class="bi"></i>
+          </div>
+        </th>
       </tr>
       </thead>
       <tbody>

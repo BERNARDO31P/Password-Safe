@@ -9,7 +9,6 @@ import {CryptUtils} from "src/assets/js/crypt_utils";
 import {User} from "src/assets/js/model/User";
 import {SecretKey} from "src/assets/js/model/SecretKey";
 import {Organization} from "src/assets/js/model/Organization";
-import {Sorting} from "src/assets/js/model/Sorting";
 
 @Component({
   selector: "admin-users",
@@ -244,6 +243,16 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
   }
 
   /**
+   * Aktualisiert die Sortierung der Tabelle und lädt die Daten neu.
+   * @param {Event} event Das auslösende Event.
+   */
+  protected override updateSorting(event: Event): void {
+    super.updateSorting(event, () => {
+      this.loadData();
+    });
+  }
+
+  /**
    * Leitet auf die angegebene Route weiter, inklusive des ID-Parameters des entsprechenden Eintrags.
    * @param {Event} event Das auslösende Event.
    * @param {string} route Die Route, auf die weitergeleitet werden soll.
@@ -254,36 +263,5 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
     let id = context.dataset["id"];
 
     this.router.navigateByUrl(location.pathname + "/" + route + "/" + id);
-  }
-
-  protected updateSorting(event: Event): void {
-    let tableHeader = event.currentTarget as HTMLTableCellElement;
-    let tableRow = tableHeader.closest("tr") as HTMLTableRowElement;
-    let clicked = tableHeader.querySelector(".bi") as HTMLSpanElement;
-
-    let icons = tableRow.querySelectorAll(".bi");
-
-    this.shared.sorting.sort = tableHeader.dataset["name"] as string;
-
-    icons.forEach((icon) => {
-      if (icon !== clicked) icon.classList.remove("bi-arrow-down", "bi-arrow-up");
-    });
-
-    if (clicked.classList.contains("bi-arrow-down")) {
-      clicked.classList.remove("bi-arrow-down");
-      clicked.classList.add("bi-arrow-up");
-
-      this.shared.sorting.order = "asc";
-    } else if (clicked.classList.contains("bi-arrow-up")) {
-      clicked.classList.remove("bi-arrow-up");
-
-      this.shared.sorting = {} as Sorting;
-    } else {
-      clicked.classList.add("bi-arrow-down");
-
-      this.shared.sorting.order = "desc";
-    }
-
-    this.loadData();
   }
 }
