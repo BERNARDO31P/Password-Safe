@@ -15,7 +15,10 @@ export class SharedService {
   user: User = {} as User;
 
   search: string = "";
+
+  private previousPage: number | null = null;
   page: number = 1;
+
   sorting: Sorting = {} as Sorting;
 
   organizations: Array<Organization> = [];
@@ -27,17 +30,26 @@ export class SharedService {
       if (params["order"]) this.sorting.order = params["order"];
 
       if (this.search === "" && params["search"]) {
+        this.previousPage = this.page;
         this.page = 1;
-        this.router.navigate(
-          [],
-          {
-            relativeTo: this.route,
-            queryParams: {page: null},
-            queryParamsHandling: "merge"
-          });
+        this.setParams({page: null});
+      } else if (!params["search"] && this.previousPage) {
+        this.setParams({page: this.previousPage});
+        this.page = this.previousPage as number;
+        this.previousPage = null;
       }
 
       this.search = params["search"] ?? "";
     });
+  }
+
+  private setParams(params: object): void {
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: params,
+        queryParamsHandling: "merge"
+      });
   }
 }
