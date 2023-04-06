@@ -144,7 +144,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
 
       let openURL = context.querySelector("#openURL") as HTMLButtonElement;
 
-      if (password.url === '') {
+      if (password.url === "") {
         openURL.classList.add("hidden");
       } else {
         openURL.classList.remove("hidden");
@@ -224,11 +224,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     let org_id = Number(this.route.snapshot.params["id"]);
     let id = Number(this.modalRef.nativeElement.dataset["id"]);
 
-    let password = structuredClone(this.formGroup.value) as Password;
-
-    password.org_id = org_id;
-    password.pass_id = id;
-
+    let password = {...this.formGroup.value, ...{org_id: org_id, pass_id: id} as Password};
     let encrypted = structuredClone(password);
     let data = await CryptUtils.encryptData(password.data as Credentials, this.secret_key);
 
@@ -241,7 +237,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
           this.password = password;
 
           let index = this.passwords.data.findIndex(password => password.pass_id === id);
-          this.passwords.data[index] = password;
+          this.passwords.data[index] = this.password;
 
           this.modal.hide();
         }
@@ -249,8 +245,10 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     } else {
       this.request("POST", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
         if (response.status === "success") {
-          this.password = password;
-          this.passwords.data.push(password);
+          this.password = response.data;
+
+          this.passwords.data.push(this.password);
+          this.passwords.count!++;
 
           this.modal.hide();
         }
@@ -281,7 +279,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     let index = this.passwords.data.findIndex(password => password.pass_id === id);
     let password = this.passwords.data[index];
 
-    if (password!.url === '') {
+    if (password.url === "") {
       this.showMessage("Bei diesem Passwort wurde keine URL hinterlegt", "error");
       return;
     }

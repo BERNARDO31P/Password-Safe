@@ -99,7 +99,7 @@ class SafeController extends AdminController
 		if (!DataRepo::insert($password)) {
 			$this->sendResponse("error", null, "Beim Hinzufügen des Passworts ist ein Fehler aufgetreten", null, 500);
 		}
-		$this->sendResponse("success", null, "Das Passwort wurde erfolgreich hinzugefügt");
+		$this->sendResponse("success", $password->toArray(), "Das Passwort wurde erfolgreich hinzugefügt");
 	}
 
 	/**
