@@ -236,8 +236,11 @@ class DataRepo
 			$stmt->execute();
 			$count = $stmt->fetch();
 		} catch (PDOException $e) {
-			error_log($e->getMessage());
 			throw new PDOException("Error getting count: " . $e->getMessage());
+		}
+
+		if ($count === false) {
+			return array();
 		}
 
 		return ["data" => array_map(fn($row) => $this->class::fromObj($row), $result), ...$count];

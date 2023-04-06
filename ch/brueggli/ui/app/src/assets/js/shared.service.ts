@@ -14,6 +14,7 @@ import {Sorting} from "./model/Sorting";
 export class SharedService {
   user: User = {} as User;
 
+  search: string = "";
   page: number = 1;
   sorting: Sorting = {} as Sorting;
 
@@ -24,6 +25,9 @@ export class SharedService {
       if (params["page"]) this.page = Number(params["page"]);
       if (params["sort"]) this.sorting.sort = params["sort"];
       if (params["order"]) this.sorting.order = params["order"];
+
+      if (this.search === "" && params["search"]) this.page = 1;
+      this.search = params["search"] ?? "";
     });
   }
 }

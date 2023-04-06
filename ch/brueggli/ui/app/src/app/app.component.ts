@@ -65,6 +65,20 @@ export class AppComponent implements AfterViewInit {
         });
       }
     }
+
+    let search = document.querySelector("#search") as HTMLInputElement;
+    if (search) {
+      search.value = this.shared.search;
+
+      setTimeout(() => {
+        let event = new Event("input", {
+          bubbles: true,
+          cancelable: true,
+        });
+
+        search.dispatchEvent(event);
+      });
+    }
   }
 
   /**
@@ -290,11 +304,20 @@ export class AppComponent implements AfterViewInit {
    */
   protected search(event: Event, endpoint: string, callback: (response: Response) => void) {
     let input = event.currentTarget as HTMLInputElement;
-
     this.searching = Boolean(input.value);
 
-    this.request("GET", endpoint + input.value, null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
-      callback(response);
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {search: (this.searching) ? input.value : null},
+        queryParamsHandling: "merge"
+      });
+
+    setTimeout(() => {
+      this.request("GET", endpoint + input.value, null, {page: this.shared.page, ...this.shared.sorting}).then(response => {
+        callback(response);
+      });
     });
   }
 
@@ -303,7 +326,8 @@ export class AppComponent implements AfterViewInit {
    * @param {Event} event Das auslösende Event.
    * @param callback Die Callback-Funktion, die ausgeführt werden soll.
    */
-  protected updateSorting(event: Event, callback = () => {}): void {
+  protected updateSorting(event: Event, callback = () => {
+  }): void {
     let tableHeader = event.currentTarget as HTMLTableCellElement;
     let tableRow = tableHeader.closest("tr") as HTMLTableRowElement;
     let clicked = tableHeader.querySelector(".bi") as HTMLSpanElement;
