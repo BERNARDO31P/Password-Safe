@@ -1,4 +1,5 @@
-import {Injectable} from '@angular/core';
+import {Injectable} from "@angular/core";
+import {ActivatedRoute} from "@angular/router";
 
 import {User} from "./model/User";
 import {Organization} from "./model/Organization";
@@ -17,4 +18,12 @@ export class SharedService {
   sorting: Sorting = {} as Sorting;
 
   organizations: Array<Organization> = [];
+
+  constructor(private route: ActivatedRoute) {
+    this.route.queryParams.subscribe(params => {
+      if (params["page"]) this.page = Number(params["page"]);
+      if (params["sort"]) this.sorting.sort = params["sort"];
+      if (params["order"]) this.sorting.order = params["order"];
+    });
+  }
 }

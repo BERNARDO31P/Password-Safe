@@ -332,6 +332,14 @@ export class AppComponent implements AfterViewInit {
       this.shared.sorting.order = "ASC";
     }
 
+    /*this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {...this.shared.sorting, this.shared.page},
+        queryParamsHandling: 'merge', // remove to replace all query params by provided
+      });*/
+
     callback();
   }
 
