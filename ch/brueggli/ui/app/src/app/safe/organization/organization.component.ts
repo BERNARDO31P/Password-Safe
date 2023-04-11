@@ -245,7 +245,9 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     } else {
       this.request("POST", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
         if (response.status === "success") {
-          this.password = response.data;
+          password.pass_id = response.data.pass_id;
+
+          this.password = password;
 
           this.passwords.data.push(this.password);
           this.passwords.count!++;
