@@ -1,7 +1,8 @@
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from "@angular/router";
+import {ActivatedRouteSnapshot, CanActivate, CanActivateFn, Router, RouterStateSnapshot, UrlTree} from "@angular/router";
 import {Injectable} from "@angular/core";
 
 import {SharedService} from "./shared.service";
+import {Observable} from "rxjs";
 
 /**
  * Ein Angular Guard, der überprüft, ob der Benutzer ein Administrator ist.
@@ -10,19 +11,14 @@ import {SharedService} from "./shared.service";
  * @param {Router} router Die Router-Instanz zur Navigation zu anderen Routen.
  * @return {boolean} Gibt true zurück, wenn der Benutzer ein Administrator ist, andernfalls false
  */
-@Injectable({
-  providedIn: 'root'
-})
-export class AdminGuard implements CanActivate {
-  constructor(private shared: SharedService, private router: Router) {}
-
-  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (!this.shared.user.is_admin) {
-      this.router.navigateByUrl('/');
+export function canActivateFnAdmin(shared: SharedService, router: Router) {
+  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
+    if (!shared.user.is_admin) {
+      router.navigateByUrl('/');
       return false;
     }
     return true;
-  }
+  };
 }
 
 /**
@@ -32,17 +28,12 @@ export class AdminGuard implements CanActivate {
  * @param {Router} router Ein Angular Service, der die Navigation innerhalb der Anwendung ermöglicht
  * @return {boolean} Gibt true zurück, wenn der Benutzer angemeldet ist, andernfalls false
  */
-@Injectable({
-  providedIn: 'root'
-})
-export class LoginGuard implements CanActivate {
-  constructor(private shared: SharedService, private router: Router) {}
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (this.shared.user.user_id === undefined) {
-      this.router.navigateByUrl('/auth/login');
+export function canActivateFnLogin(shared: SharedService, router: Router) {
+  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
+    if (shared.user.user_id === undefined) {
+      router.navigateByUrl('/auth/login');
       return false;
     }
     return true;
-  }
+  };
 }
