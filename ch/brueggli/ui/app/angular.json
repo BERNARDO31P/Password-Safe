@@ -29,14 +29,12 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
-              "node_modules/bootstrap-select/dist/css/bootstrap-select.min.css",
               "node_modules/sweetalert2/dist/sweetalert2.min.css",
               "src/styles.scss"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/bootstrap-select/dist/js/bootstrap-select.min.js",
               "node_modules/sweetalert2/dist/sweetalert2.min.js"
             ]
           },

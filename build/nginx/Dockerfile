@@ -1,5 +1,5 @@
 # Definiere das Basisimage, das für den Build-Prozess verwendet werden soll
-FROM node:18.14-slim as build
+FROM node:lts-slim as build
 
 # Setze das Arbeitsverzeichnis für den Build-Prozess
 WORKDIR /app
@@ -11,13 +11,16 @@ COPY /ch/brueggli/ui/app/package.json /app/
 RUN npm install
 
 # Definiere das Basisimage, das für den finalen Container verwendet werden soll
-FROM nginx:1.23-alpine-slim
+FROM nginx:stable-alpine-slim
 
 # Kopiere die gebauten Dateien aus dem Build-Container in den finalen Container
 COPY --chown=nginx:nginx --from=build /app/node_modules /usr/share/nginx/html/node_modules
 
 # Kopiere das Startup-Skript in den finalen Container
 COPY /build/nginx/startup.sh /startup.sh
+
+# Aktualisiere die Paketliste
+RUN apk update
 
 # Installiere npm und Node.js
 RUN apk add nodejs=18.14.2-r0 npm

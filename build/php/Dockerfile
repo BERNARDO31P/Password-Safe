@@ -1,5 +1,5 @@
 # Definiere das Basisimage für den Build-Prozess
-FROM composer:2.5 as build
+FROM composer:lts as build
 
 # Setze das Arbeitsverzeichnis für den Build-Prozess
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY /ch/brueggli/backend/src/composer.json /app/
 RUN composer install
 
 # Definiere das Basisimage für den finalen Container
-FROM php:8.2-fpm-alpine
+FROM php:fpm-alpine
 
 # Installiere die pdo_mysql PHP-Erweiterung
 RUN docker-php-ext-install pdo_mysql
