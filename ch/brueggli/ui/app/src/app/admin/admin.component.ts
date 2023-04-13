@@ -8,7 +8,6 @@ import {SharedService} from "src/assets/js/shared.service";
 import {CryptUtils} from "src/assets/js/crypt_utils";
 
 import {Password} from "src/assets/js/model/Password";
-import {Member} from "src/assets/js/model/Member";
 import {SecretKey} from "src/assets/js/model/SecretKey";
 
 @Component({
