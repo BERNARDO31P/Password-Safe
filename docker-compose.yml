@@ -8,9 +8,9 @@ services:
       intern:
         ipv4_address: 10.0.2.3
     volumes:
+      - ./logs:/usr/src/backend/logs
       - ./ch/brueggli/backend/src/.:/usr/src/backend
       - /usr/src/backend/vendor
-      - /usr/src/backend/logs
     env_file:
       - ./config/php/variables.env
   nginx:
