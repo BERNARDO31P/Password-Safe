@@ -70,7 +70,8 @@ export class UsersComponent extends AdminComponent implements AfterViewChecked, 
   }
 
   ngAfterViewChecked() {
-    this.setLocation("Benutzer");
+    if (typeof this.setLocation !== "undefined")
+      this.setLocation("Benutzer");
   }
 
   ngOnDestroy() {

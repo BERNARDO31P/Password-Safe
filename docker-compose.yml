@@ -2,6 +2,8 @@ version: "3.9"
 services:
   php:
     restart: always
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: build/php/Dockerfile

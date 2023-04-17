@@ -20,7 +20,8 @@ export class SafeComponent extends AppComponent {
   }, load = false) {
     super.ngAfterViewInit();
 
-    this.setLocation("Tresor");
+    if (typeof this.setLocation !== "undefined")
+      this.setLocation("Tresor");
 
     if (load) this.request("GET", this.API_HOST + "/safe").then(response => {
       if (response.status === "success") {

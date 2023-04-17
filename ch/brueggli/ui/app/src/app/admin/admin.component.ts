@@ -23,7 +23,8 @@ export class AdminComponent extends AppComponent {
   override ngAfterViewInit() {
     super.ngAfterViewInit();
 
-    this.setLocation("Admin");
+    if (typeof this.setLocation !== "undefined")
+      this.setLocation("Admin");
   }
 
   /**

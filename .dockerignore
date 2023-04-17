@@ -1,1 +1,28 @@
+# GitHub
 **/.gitignore
+**/.editorconfig
+**/.gitattributes
+**/.gitkeep
+
+**/README.md
+**/LICENSE
+**/CHANGELOG.md
+
+
+# IDE
+**/.idea/
+**/.vscode/
+**/.vs/
+
+
+# Packages
+**/composer.lock
+**/package-lock.json
+
+**/vendor/
+**/node_modules/
+**/.angular/
+
+
+# Docker
+**/docker-compose*

@@ -59,7 +59,8 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
   }
 
   ngAfterViewChecked() {
-    this.setLocation("Organisationen");
+    if (typeof this.setLocation !== "undefined")
+      this.setLocation("Organisationen");
   }
 
   ngOnDestroy() {
