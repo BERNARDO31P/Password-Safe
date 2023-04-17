@@ -16,9 +16,9 @@ function getDbh(callable $callback, callable $callbackError): PDO|null
 	try {
 		$callback();
 		return new PDO(
-			"mysql:host=" . getenv("DB_HOST") . ";dbname=" . getenv("DB_NAME") . ";charset=utf8",
-			getenv("DB_USER"),
-			getenv("DB_PWD"),
+			"mysql:host=" . getenv("MYSQL_HOST") . ";dbname=" . getenv("MYSQL_DB_NAME") . ";charset=utf8",
+			getenv("MYSQL_USER"),
+			getenv("MYSQL_PW"),
 			[
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

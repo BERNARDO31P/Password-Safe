@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   php:
+    restart: always
     build:
       context: .
       dockerfile: build/php/Dockerfile
@@ -11,9 +12,8 @@ services:
       - ./logs:/usr/src/backend/logs
       - ./ch/brueggli/backend/src/.:/usr/src/backend
       - /usr/src/backend/vendor
-    env_file:
-      - ./config/php/variables.env
   nginx:
+    restart: always
     build:
       context: .
       dockerfile: build/nginx/Dockerfile
@@ -29,9 +29,12 @@ services:
       - /usr/share/nginx/html/node_modules
       - /usr/share/nginx/html/.angular
   mysql:
+    restart: always
     image: "mariadb:10.11-jammy"
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PW}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PW}"
     networks:
       intern:
         ipv4_address: 10.0.2.4
