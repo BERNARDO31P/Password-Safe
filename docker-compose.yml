@@ -24,6 +24,7 @@ services:
       intern:
         ipv4_address: 10.0.2.2
     volumes:
+      - ./logs:/var/log/nginx
       - ./config/nginx:/etc/nginx
       - ./ch/brueggli/ui/app/.:/usr/share/nginx/html
       - /usr/share/nginx/html/node_modules
@@ -39,10 +40,10 @@ services:
       intern:
         ipv4_address: 10.0.2.4
     volumes:
+      - ./logs:/var/log/mysql
       - ./config/mariadb/script:/docker-entrypoint-initdb.d
       - ./config/mariadb/my.cnf:/etc/mysql/my.cnf
       - ./data:/var/lib/mysql
-
 networks:
   intern:
     name: "Internal network"
