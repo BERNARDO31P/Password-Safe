@@ -1,0 +1,30 @@
+<div>
+  <h4 class="d-inline-block text-truncate">Daten Importierung</h4>
+  <button class="btn float-end" label="Importieren..." (click)="fileInput.click()">
+    Datei laden
+    <input #fileInput type="file" hidden (change)="loadFile($event)">
+  </button>
+</div>
+<p id="fileName">{{fileName}}</p>
+<ng-container *ngIf="hasData(entries) === 0">
+  <div class="overflow-auto h-table">
+    <table class="table">
+      <thead>
+      <tr>
+        <th (click)="updateSorting($event)" class="text-nowrap" *ngFor="let key of Object.keys(entries.data[0]) | slice:1: 7" [attr.data-name]="key">
+          {{translation[key]}}
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr (contextmenu)="updateContext($event)" *ngFor="let entry of entries.data | paginate: {itemsPerPage: PAGE_COUNT, currentPage: shared.page, totalItems: entries.count}" [attr.data-id]="entry.entry_id">
+          <td class="text-truncate" *ngFor="let value of Object.values(entry) | slice:1: 7">{{value}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="text-center mt-2" *ngIf="entries.count! / PAGE_COUNT > 1">
+    <pagination-controls (pageChange)="shared.page = $event" routerLink="." [queryParams]="{page: shared.page}" [queryParamsHandling]="'merge'"></pagination-controls>
+  </div>
+  <button class="btn btn-primary" (click)="importData()">Bestätigen</button>
+</ng-container>

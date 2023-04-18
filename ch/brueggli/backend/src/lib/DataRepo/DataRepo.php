@@ -171,7 +171,10 @@ class DataRepo
 			throw new PDOException("Error getting data: " . $e->getMessage());
 		}
 
-		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($this->getCount());
+		$sql = $this->getCount() . " AND " . $field . " = :" . $field;
+		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
+
+		$stmt->bindParam($field, $value);
 
 		try {
 			$stmt->execute();

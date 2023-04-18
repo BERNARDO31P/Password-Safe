@@ -33,7 +33,7 @@ export class AppComponent implements AfterViewInit {
   title: string = "";
   Object = Object;
 
-  constructor(protected shared: SharedService, private titleService: Title, protected router: Router, protected route: ActivatedRoute, protected changeDetectorRef: ChangeDetectorRef) {
+  constructor(protected shared: SharedService, protected titleService: Title, protected router: Router, protected route: ActivatedRoute, protected changeDetectorRef: ChangeDetectorRef) {
     if (this.shared.user.user_id === undefined) {
       let data = localStorage.getItem("user");
       if (data) {

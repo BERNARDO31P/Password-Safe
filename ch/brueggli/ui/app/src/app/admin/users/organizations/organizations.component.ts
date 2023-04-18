@@ -85,8 +85,8 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
    * Verschlüsselt den öffentlichen Schlüssel der Organisation mit dem Schlüssel des Benutzers.
    * Sendet die verschlüsselten Daten an den Server.
    */
-  protected override add() {
-    let org_id = Number(this.contextMenu.nativeElement.dataset["id"]);
+  override async add(org_id?: number) {
+    org_id = (org_id === undefined) ? Number(this.contextMenu.nativeElement.dataset["id"]) : org_id;
 
     this.showLoading();
     this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/key").then(async response => {
@@ -116,6 +116,7 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
                 this.request("POST", this.API_HOST + "/admin/organization/member", JSON.stringify({member: member_entry})).then(response => {
                   if (response.status === "success") {
                     this.userOrganizations.push(member_entry);
+                    return;
                   }
                 });
               }

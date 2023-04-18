@@ -36,7 +36,7 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
       updateOn: "change"
     });
 
-  declare organizations: { data: Array<Organization>, count?: number };
+  organizations: { data: Array<Organization>, count?: number } = {data: []};
   organization: Organization = {} as Organization;
 
   @ViewChild("context") declare contextMenu: ElementRef;
@@ -105,50 +105,52 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
    * Wenn die ID der Organisation bekannt ist, wird diese angepasst.
    * Sonst wird eine neue mit einem symmetrischen Schlüssel erstellt.
    */
-  protected save() {
+  async save(): Promise<number> {
     if (!this.formGroup.valid) {
       this.showMessage("Programmmanipulation festgestellt", "error");
-      return;
+      return Promise.reject();
     }
 
-    let id = Number(this.modalRef.nativeElement.dataset["id"]);
-    if (id) {
-      this.request("PATCH", this.API_HOST + "/admin/organization/" + id, JSON.stringify(this.formGroup.value)).then(response => {
-        if (response.status === "success") {
-          this.organization = {...this.organization, ...this.formGroup.value as Organization};
+    return new Promise<number>((resolve) => {
+      let id = (this.modalRef !== undefined) ? Number(this.modalRef.nativeElement.dataset["id"]) : undefined;
 
-          let index = this.organizations.data.findIndex(org => org.org_id === id);
-          this.organizations.data[index] = this.organization;
+      if (id) {
+        this.request("PATCH", this.API_HOST + "/admin/organization/" + id, JSON.stringify(this.formGroup.value)).then(response => {
+          if (response.status === "success") {
+            this.organization = {...this.organization, ...this.formGroup.value as Organization};
 
-          this.modal.hide();
-        }
-      });
-    } else {
-      this.request("POST", this.API_HOST + "/admin/organizations", JSON.stringify(this.formGroup.value)).then(async response => {
-        if (response.status === "success") {
-          this.showLoading();
+            let index = this.organizations.data.findIndex(org => org.org_id === id);
+            this.organizations.data[index] = this.organization;
 
-          this.organizations.data.push(response.data);
-          this.organizations.count!++;
+            this.modal.hide();
+          }
+        });
+      } else {
+        this.request("POST", this.API_HOST + "/admin/organizations", JSON.stringify(this.formGroup.value)).then(async response => {
+          if (response.status === "success") {
+            this.showLoading();
 
-          let org_id = response.data.org_id;
+            this.organizations.data.push(response.data);
+            this.organizations.count!++;
 
-          new Promise<void>((resolve) => {
+            let org_id = response.data.org_id;
+
             this.request("GET", this.API_HOST + "/admin/users/admins").then(async response => {
               if (response.status === "success") {
                 let secret_keys = await CryptUtils.generateSecretKeys(response.data, org_id, this.shared.user.sign_private_key as CryptoKey);
 
                 await this.request("POST", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
-                resolve();
               }
+            }).then(() => {
+              this.showMessage(response.message, response.status);
+              if (this.modal !== undefined) this.modal.hide();
+
+              resolve(org_id);
             });
-          }).then(() => {
-            this.showMessage(response.message, response.status);
-            this.modal.hide();
-          });
-        }
-      });
-    }
+          }
+        });
+      }
+    });
   }
 
   /**

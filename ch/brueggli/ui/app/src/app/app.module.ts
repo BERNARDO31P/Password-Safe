@@ -25,6 +25,7 @@ import {OrganizationsComponent} from "./admin/organizations/organizations.compon
 import {SafeComponent} from "./safe/safe.component";
 import {SafeHomeComponent} from "./safe/home/home.component";
 import {SafeOrganizationComponent} from "./safe/organization/organization.component";
+import { ImportComponent } from './admin/import/import.component';
 
 
 @NgModule({
@@ -49,6 +50,7 @@ import {SafeOrganizationComponent} from "./safe/organization/organization.compon
     SafeOrganizationComponent,
 
     YesNoPipe,
+     ImportComponent,
   ],
   imports: [
     BrowserModule,

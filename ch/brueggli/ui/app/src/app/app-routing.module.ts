@@ -11,6 +11,7 @@ import {AdminComponent} from "./admin/admin.component";
 import {AdminHomeComponent} from "./admin/home/home.component";
 
 import {OrganizationsComponent} from "./admin/organizations/organizations.component";
+import {ImportComponent} from "./admin/import/import.component";
 
 import {UsersComponent} from "./admin/users/users.component";
 import {UserOrganizationsComponent} from "./admin/users/organizations/organizations.component";
@@ -47,6 +48,8 @@ const routes: Routes = [
         {component: UsersComponent, path: "users"},
 
         {component: OrganizationsComponent, path: "organizations"},
+
+        {component: ImportComponent, path: "import"},
       ]
   },
   {

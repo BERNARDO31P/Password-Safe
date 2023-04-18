@@ -66,7 +66,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     }
   );
 
-  passwords!: { data: Array<Password>, count?: number };
+  passwords: { data: Array<Password>, count?: number } = {data: []};
   password: Password = {} as Password;
   organization!: Organization;
   secret_key!: CryptoKey;
@@ -215,14 +215,14 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
    * Wenn die ID des Passworts bekannt ist, wird dieses angepasst.
    * Sonst wird ein neues erstellt.
    */
-  protected async save() {
+  async save() {
     if (this.hasErrors(this.formGroup.controls, "password")) {
       this.showMessage("Programmmanipulation festgestellt", "error");
       return;
     }
 
-    let org_id = Number(this.route.snapshot.params["id"]);
-    let id = Number(this.modalRef.nativeElement.dataset["id"]);
+    let org_id = this.organization.org_id;
+    let id = (this.modalRef !== undefined) ? Number(this.modalRef.nativeElement.dataset["id"]) : undefined;
 
     let password = {...this.formGroup.value, ...{org_id: org_id, pass_id: id} as Password};
     let encrypted = structuredClone(password);
@@ -252,7 +252,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
           this.passwords.data.push(this.password);
           this.passwords.count!++;
 
-          this.modal.hide();
+          if (this.modal !== undefined) this.modal.hide();
         }
       });
     }
