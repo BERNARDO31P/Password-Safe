@@ -17,13 +17,16 @@ FROM php:fpm-alpine
 RUN docker-php-ext-install pdo_mysql
 
 # Kopiere die Vendor-Dateien aus dem Build-Container in den finalen Container
-COPY --chown=www-data:www-data --from=build /app/vendor /usr/src/backend/vendor
+COPY --chown=root:root --from=build /app/vendor /usr/src/backend/vendor
 
 # Erstelle im finalen Container ein Verzeichnis für die Logs
 RUN mkdir /usr/src/backend/logs
 
+# Lade die Konfigurationsdatei für PHP-FPM in den Container
+COPY /config/php/zzz-docker.conf /usr/local/etc/php-fpm.d/zzz-docker.conf
+
 # Setze die Besitzerrechte für die kopierten Dateien und Verzeichnisse auf den www-data Benutzer und die www-data Gruppe
-RUN chown -R www-data:www-data /usr/src
+RUN chown -R root:root /usr/src
 
 # Setzt die Zeitzone für den Container
 RUN apk add --no-cache tzdata
