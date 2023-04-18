@@ -25,5 +25,9 @@ RUN mkdir /usr/src/backend/logs
 # Setze die Besitzerrechte für die kopierten Dateien und Verzeichnisse auf den www-data Benutzer und die www-data Gruppe
 RUN chown -R www-data:www-data /usr/src
 
+# Setzt die Zeitzone für den Container
+RUN apk add --no-cache tzdata
+ENV TZ="Europe/Zurich"
+
 # Setze das Arbeitsverzeichnis für den finalen Container
 WORKDIR /usr/src/backend
