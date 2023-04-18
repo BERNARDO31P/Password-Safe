@@ -4,7 +4,7 @@
 </div>
 <form>
   <div class="mb-3">
-    <input (input)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
+    <input (keyup)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
   </div>
 </form>
 <ng-container *ngIf="hasData(organizations) === 0 else nodata">

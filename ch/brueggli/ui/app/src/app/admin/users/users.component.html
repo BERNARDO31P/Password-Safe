@@ -1,7 +1,7 @@
 <h4 class="d-inline-block">Verwaltung: Benutzer</h4>
 <form>
   <div class="mb-3">
-    <input (input)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
+    <input (keyup)="search($event)" type="text" class="form-control" id="search" placeholder="Suche..">
   </div>
 </form>
 <ng-container *ngIf="hasData(users) === 0 else nodata">
