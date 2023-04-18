@@ -33,7 +33,9 @@ services:
       - /usr/share/nginx/html/.angular
   mysql:
     restart: always
-    image: "mariadb:10.11-jammy"
+    build:
+      context: .
+      dockerfile: build/mariadb/Dockerfile
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PW}"
       MYSQL_USER: "${MYSQL_USER}"
@@ -43,9 +45,9 @@ services:
         ipv4_address: 10.0.2.4
     volumes:
       - ./logs:/var/log/mysql
+      - ./data:/var/lib/mysql
       - ./config/mariadb/script:/docker-entrypoint-initdb.d
       - ./config/mariadb/my.cnf:/etc/mysql/my.cnf
-      - ./data:/var/lib/mysql
 networks:
   intern:
     name: "Internal network"

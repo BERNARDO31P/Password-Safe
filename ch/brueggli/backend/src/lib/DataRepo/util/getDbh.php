@@ -25,8 +25,7 @@ function getDbh(callable $callback, callable $callbackError): PDO|null
 				PDO::ATTR_EMULATE_PREPARES => true,
 			]
 		);
-	} catch (Exception $e) {
-		error_log($e->getMessage());
+	} catch (Exception) {
 		$callbackError();
 	}
 	return null;
