@@ -27,7 +27,7 @@ chmod +x set_permissions.sh
 
 Docker Container starten
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Datenbank/Backup
@@ -37,7 +37,7 @@ Es muss lediglich dieser Ordner gesichert werden.
 ## Updates
 Um die neuste Version der Pakete zu installieren, müssen die Container neu erstellt werden.
 ```shell
-docker-compose up -d --build --force-recreate
+docker compose up -d --build --force-recreate
 ```
 Aus Gründen der sicherheit und stabilität sollte dies regelmässig gemacht werden.
 Major-Releases werden nicht berücksichtigt, da diese das Projekt grundlegend verändern können. 
