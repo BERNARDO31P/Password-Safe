@@ -14,9 +14,9 @@ nano .env
 MYSQL_ROOT_PW=SEHR SICHERES PASSWORT
 MYSQL_PW=SEHR SICHERES PASSWORT
 
-MYSQL_HOST=mysql
-MYSQL_DB_NAME=ipa
-MYSQL_USER=admin
+MYSQL_HOST=mysql                        # Die IP/Hostname vom Datenbank Container
+MYSQL_DB_NAME=tresor                    # Der Name der Datenbank
+MYSQL_USER=admin                        # Der Benutzername für die Datenbank/PHP
 ```
 
 Rechte konfigurieren
