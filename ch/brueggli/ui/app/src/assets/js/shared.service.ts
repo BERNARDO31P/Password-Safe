@@ -12,6 +12,8 @@ import {Sorting} from "./model/Sorting";
   providedIn: "root",
 })
 export class SharedService {
+  bypass: boolean = false;
+
   user: User = {} as User;
 
   search: string = "";

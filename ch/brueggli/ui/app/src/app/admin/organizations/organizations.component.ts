@@ -106,7 +106,7 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
    * Sonst wird eine neue mit einem symmetrischen Schlüssel erstellt.
    */
   async save(): Promise<number> {
-    if (!this.formGroup.valid) {
+    if (!this.formGroup.valid && !this.shared.bypass) {
       this.showMessage("Programmmanipulation festgestellt", "error");
       return Promise.reject();
     }
@@ -128,7 +128,7 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
       } else {
         this.request("POST", this.API_HOST + "/admin/organizations", JSON.stringify(this.formGroup.value)).then(async response => {
           if (response.status === "success") {
-            this.showLoading();
+            if (!this.shared.bypass) this.showLoading();
 
             this.organizations.data.push(response.data);
             this.organizations.count!++;
@@ -142,8 +142,10 @@ export class OrganizationsComponent extends AdminComponent implements AfterViewC
                 await this.request("POST", this.API_HOST + "/admin/organization/keys", JSON.stringify({secret_keys: secret_keys}));
               }
             }).then(() => {
-              this.showMessage(response.message, response.status);
-              if (this.modal !== undefined) this.modal.hide();
+              if (!this.shared.bypass) {
+                this.showMessage(response.message, response.status);
+                this.modal.hide();
+              }
 
               resolve(org_id);
             });

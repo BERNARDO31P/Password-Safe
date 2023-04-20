@@ -85,8 +85,8 @@ export class UserOrganizationsComponent extends OrganizationsComponent {
    * Verschlüsselt den öffentlichen Schlüssel der Organisation mit dem Schlüssel des Benutzers.
    * Sendet die verschlüsselten Daten an den Server.
    */
-  override async add(org_id?: number) {
-    org_id = (org_id === undefined) ? Number(this.contextMenu.nativeElement.dataset["id"]) : org_id;
+  override async add() {
+    let org_id = Number(this.contextMenu.nativeElement.dataset["id"]);
 
     this.showLoading();
     this.request("GET", this.API_HOST + "/admin/organization/" + org_id + "/key").then(async response => {

@@ -216,7 +216,7 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
    * Sonst wird ein neues erstellt.
    */
   async save() {
-    if (this.hasErrors(this.formGroup.controls, "password")) {
+    if (this.hasErrors(this.formGroup.controls, "password") && !this.shared.bypass) {
       this.showMessage("Programmmanipulation festgestellt", "error");
       return;
     }
@@ -231,31 +231,36 @@ export class SafeOrganizationComponent extends SafeComponent implements OnDestro
     encrypted.data = data;
     encrypted.sign = await CryptUtils.signData(data, this.shared.user.sign_private_key as CryptoKey);
 
-    if (password.pass_id) {
-      this.request("PATCH", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
-        if (response.status === "success") {
-          this.password = password;
+    return new Promise<void> ((resolve) => {
+      if (password.pass_id) {
+        this.request("PATCH", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
+          if (response.status === "success") {
+            this.password = password;
 
-          let index = this.passwords.data.findIndex(password => password.pass_id === id);
-          this.passwords.data[index] = this.password;
+            let index = this.passwords.data.findIndex(password => password.pass_id === id);
+            this.passwords.data[index] = this.password;
+            this.modal.hide();
 
-          this.modal.hide();
-        }
-      });
-    } else {
-      this.request("POST", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
-        if (response.status === "success") {
-          password.pass_id = response.data.pass_id;
+            resolve();
+          }
+        });
+      } else {
+        this.request("POST", this.API_HOST + "/safe", JSON.stringify(encrypted)).then(response => {
+          if (response.status === "success") {
+            password.pass_id = response.data.pass_id;
 
-          this.password = password;
+            this.password = password;
 
-          this.passwords.data.push(this.password);
-          this.passwords.count!++;
+            this.passwords.data.push(this.password);
+            this.passwords.count!++;
 
-          if (this.modal !== undefined) this.modal.hide();
-        }
-      });
-    }
+            if (!this.shared.bypass) this.modal.hide();
+
+            resolve();
+          }
+        });
+      }
+    });
   }
 
   /**

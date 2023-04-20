@@ -87,12 +87,13 @@ export class ImportComponent extends AdminComponent {
 
     userOrganizationsComponent.user = this.shared.user;
 
+    this.shared.bypass = true;
+    this.showLoading();
     await new Promise<void>(async (resolve) => {
       const promises = organizations.map(async (organization) => {
         organizationsComponent.formGroup.patchValue({name: organization});
 
         let org_id = await organizationsComponent.save();
-        await userOrganizationsComponent.add(org_id);
         this.shared.organizations.push({name: organization, org_id: org_id});
       });
 
@@ -121,7 +122,12 @@ export class ImportComponent extends AdminComponent {
       }
     }
 
-    this.entries = {data: [], count: 0};
-    this.fileName = "Keine Datei ausgewählt";
+    setTimeout(() => {
+      this.entries = {data: [], count: 0};
+      this.fileName = "Keine Datei ausgewählt";
+      this.shared.bypass = false;
+
+      this.showMessage("Die Daten wurden erfolgreich importiert", "success");
+    }, 1000);
   }
 }

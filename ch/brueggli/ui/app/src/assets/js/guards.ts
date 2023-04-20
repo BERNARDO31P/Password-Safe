@@ -47,19 +47,24 @@ export class AdminGuard {
   }
 }
 
+/**
+ * Ein Angular Guard, der überprüft, ob der Benutzer mit dem Root Konto angemeldet ist.
+ * Wenn der Benutzer nicht mit den Root Konto angemeldet ist, wird er zur Startseite weitergeleitet und die Navigation wird blockiert.
+ * @param {SharedService} shared Die VariableService-Instanz zur gemeinsamen Nutzung von Variablen.
+ * @param {Router} router Die Router-Instanz zur Navigation zu anderen Routen.
+ * @return {boolean} Gibt true zurück, wenn der Benutzer mit dem Root Konto angemeldet ist, andernfalls false
+ */
+@Injectable({
+  providedIn: 'root',
+})
+export class RootGuard {
+  constructor(private shared: SharedService, private router: Router) {}
 
-export function canActivateFnAdmin(shared: SharedService, router: Router): boolean {
-  if (!shared.user.is_admin) {
-    router.navigateByUrl("/");
-    return false;
+  canActivate(): Observable<boolean> {
+    if (this.shared.user.user_id !== 1) {
+      this.router.navigateByUrl('/');
+      return of(false);
+    }
+    return of(true);
   }
-  return true;
-}
-
-export function canActivateFnLogin(shared: SharedService, router: Router): boolean {
-  if (shared.user.user_id === undefined) {
-    router.navigateByUrl("/auth/login");
-    return false;
-  }
-  return true;
 }

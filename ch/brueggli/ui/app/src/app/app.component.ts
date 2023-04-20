@@ -117,7 +117,7 @@ export class AppComponent implements AfterViewInit {
       parsed = JSON.parse(text) as Response;
     });
 
-    if (parsed.message) {
+    if (parsed.message && !this.shared.bypass) {
       this.showMessage(parsed.message, parsed.status);
     }
 

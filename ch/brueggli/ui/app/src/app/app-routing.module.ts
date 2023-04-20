@@ -20,7 +20,7 @@ import {SafeComponent} from "./safe/safe.component";
 import {SafeHomeComponent} from "./safe/home/home.component";
 import {SafeOrganizationComponent} from "./safe/organization/organization.component";
 
-import {AdminGuard, LoginGuard} from "src/assets/js/guards";
+import {AdminGuard, LoginGuard, RootGuard} from "src/assets/js/guards";
 
 
 const routes: Routes = [
@@ -49,7 +49,7 @@ const routes: Routes = [
 
         {component: OrganizationsComponent, path: "organizations"},
 
-        {component: ImportComponent, path: "import"},
+        {component: ImportComponent, path: "import", canActivate: [RootGuard]},
       ]
   },
   {

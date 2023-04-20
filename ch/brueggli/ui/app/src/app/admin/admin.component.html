@@ -12,7 +12,7 @@
         <a data-bs-dismiss="offcanvas" class="nav-link" routerLink="organizations">Organisationen</a>
       </li>
     </ul>
-    <ul class="navbar-nav flex-column me-auto mb-2 mb-lg-0 navbar-bottom">
+    <ul class="navbar-nav flex-column me-auto mb-2 mb-lg-0 navbar-bottom" *ngIf="shared.user.user_id === 1">
       <li class="nav-item">
         <a data-bs-dismiss="offcanvas" class="nav-link" routerLink="import">Importieren</a>
       </li>
