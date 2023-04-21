@@ -28,6 +28,8 @@ docker compose up -d
 Die Daten werden im `data` Ordner gespeichert und bleiben auch nach einem Neustart oder Neuinstallation erhalten.
 Es muss lediglich dieser Ordner gesichert werden.
 
+Andersherum, muss dieser Ordner gelöscht werden, um den Tresor zurückzusetzen.
+
 ## Updates
 Um die neuste Version der Pakete zu installieren, müssen die Container neu erstellt werden.
 ```shell
