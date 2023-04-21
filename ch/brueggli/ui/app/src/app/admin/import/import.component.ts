@@ -1,9 +1,12 @@
-import {Component} from '@angular/core';
-import {AdminComponent} from "../admin.component";
-import {OrganizationsComponent} from "../organizations/organizations.component";
-import {SafeOrganizationComponent} from "../../safe/organization/organization.component";
-import {CryptUtils} from "../../../assets/js/crypt_utils";
-import {UserOrganizationsComponent} from "../users/organizations/organizations.component";
+import {Component} from "@angular/core";
+
+import {AdminComponent} from "src/app/admin/admin.component";
+import {OrganizationsComponent} from "src/app/admin/organizations/organizations.component";
+import {UserOrganizationsComponent} from "src/app/admin/users/organizations/organizations.component";
+
+import {SafeOrganizationComponent} from "src/app/safe/organization/organization.component";
+
+import {CryptUtils} from "src/assets/js/crypt_utils";
 
 type Entry = {
   entry_id: number,
@@ -34,6 +37,10 @@ export class ImportComponent extends AdminComponent {
   protected fileName = "Keine Datei ausgewählt";
   protected entries: { data: Array<Entry>, count: number } = {data: [], count: 0};
 
+  /**
+   * Lädt die Datei und parst sie.
+   * @param {Event} event Das Event, welches ausgelöst wurde.
+   */
   protected loadFile(event: Event) {
     let target = event.target as HTMLInputElement;
     let file = target.files![0] as File;
@@ -49,6 +56,11 @@ export class ImportComponent extends AdminComponent {
     reader.readAsText(file);
   }
 
+  /**
+   * Parst die XML-Datei und speichert die Daten in der Variable entries.
+   * XML kann mit üblichen HTML-Funktionen geparst werden.
+   * @param {string} content Der Inhalt der XML-Datei.
+   */
   protected parseFile(content: string) {
     let parser = new DOMParser();
     let xmlDoc = parser.parseFromString(content, "text/xml");
@@ -78,6 +90,10 @@ export class ImportComponent extends AdminComponent {
     });
   }
 
+  /**
+   * Importiert die Daten in den Tresor.
+   * Erstellt zuerst die Organisationen und dann die Einträge.
+   */
   protected async importData() {
     const organizations = Array.from(new Set(this.entries.data.map(entry => entry.group)));
 
