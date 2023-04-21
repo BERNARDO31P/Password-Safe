@@ -1,36 +1,36 @@
-# Definiere das Basisimage für den Build-Prozess
+# Definiert das Basisimage für den Build-Prozess
 FROM composer:lts as build
 
-# Setze das Arbeitsverzeichnis für den Build-Prozess
+# Setzt das Arbeitsverzeichnis für den Build-Prozess
 WORKDIR /app
 
-# Kopiere die composer.json-Datei in den Build-Container
+# Kopiert die composer.json-Datei in den Build-Container
 COPY /ch/brueggli/backend/src/composer.json /app/
 
-# Installiere die Abhängigkeiten im Build-Container mit Composer
+# Installiert die Abhängigkeiten im Build-Container mit Composer
 RUN composer install
 
-# Definiere das Basisimage für den finalen Container
+# Definiert das Basisimage für den finalen Container
 FROM php:fpm-alpine
 
-# Installiere die pdo_mysql PHP-Erweiterung
+# Installiert die pdo_mysql PHP-Erweiterung
 RUN docker-php-ext-install pdo_mysql
 
-# Kopiere die Vendor-Dateien aus dem Build-Container in den finalen Container
+# Kopiert die Vendor-Dateien aus dem Build-Container in den finalen Container
 COPY --chown=root:root --from=build /app/vendor /usr/src/backend/vendor
 
-# Erstelle im finalen Container ein Verzeichnis für die Logs
+# Erstellt im finalen Container ein Verzeichnis für die Logs
 RUN mkdir /usr/src/backend/logs
 
-# Lade die Konfigurationsdatei für PHP-FPM in den Container
+# Lädt die Konfigurationsdatei für PHP-FPM in den Container
 COPY /config/php/zzz-docker.conf /usr/local/etc/php-fpm.d/zzz-docker.conf
 
-# Setze die Besitzerrechte für die kopierten Dateien und Verzeichnisse auf den www-data Benutzer und die www-data Gruppe
+# Setzt die Besitzerrechte für die kopierten Dateien und Verzeichnisse auf den root Benutzer und die root Gruppe
 RUN chown -R root:root /usr/src
 
 # Setzt die Zeitzone für den Container
 RUN apk add --no-cache tzdata
 ENV TZ="Europe/Zurich"
 
-# Setze das Arbeitsverzeichnis für den finalen Container
+# Setzt das Arbeitsverzeichnis für den finalen Container
 WORKDIR /usr/src/backend
