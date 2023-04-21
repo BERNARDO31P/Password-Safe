@@ -19,12 +19,6 @@ MYSQL_DB_NAME=tresor                    # Der Name der Datenbank
 MYSQL_USER=admin                        # Der Benutzername für die Datenbank/PHP
 ```
 
-Rechte konfigurieren
-```shell
-chmod +x set_permissions.sh
-./set_permissions.sh
-```
-
 Docker Container starten
 ```shell
 docker compose up -d
