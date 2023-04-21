@@ -2,7 +2,7 @@
 ## Installation
 Repository klonen
 ```shell
-git clone https://github.com/bruggli/passwort-tresor.git
+git clone https://github.com/brueggli/passwort-tresor.git
 cd passwort-tresor
 ```
 
