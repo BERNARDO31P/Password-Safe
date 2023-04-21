@@ -7,12 +7,14 @@ cd passwort-tresor
 ```
 
 Anmeldedaten definieren
-```
+```shell
 nano .env
+```
 
-# Beispiel vom Inhalt
-MYSQL_ROOT_PW=SEHR SICHERES PASSWORT
-MYSQL_PW=SEHR SICHERES PASSWORT
+Beispiel vom Inhalt
+```ini
+MYSQL_ROOT_PW=SEHR SICHERES PASSWORT    # Root Passwort für die Datenbank
+MYSQL_PW=SEHR SICHERES PASSWORT         # Passwort für den Benutzer/PHP
 
 MYSQL_HOST=mysql                        # Die IP/Hostname vom Datenbank Container
 MYSQL_DB_NAME=tresor                    # Der Name der Datenbank
