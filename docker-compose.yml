@@ -42,13 +42,13 @@ services:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PW}"
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PW}"
+      MYSQL_DB: "${MYSQL_DB_NAME}"
     networks:
       intern:
         ipv4_address: 10.0.2.4
     volumes:
       - ./logs:/var/log/mysql
       - ./data:/var/lib/mysql
-      - ./config/mariadb/script:/docker-entrypoint-initdb.d
       - ./config/mariadb/my.cnf:/etc/mysql/my.cnf
 networks:
   intern:
