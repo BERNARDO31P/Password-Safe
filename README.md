@@ -13,12 +13,17 @@ nano .env
 
 Beispiel vom Inhalt
 ```ini
-MYSQL_ROOT_PW=SEHR SICHERES PASSWORT    # Root Passwort für die Datenbank
-MYSQL_PW=SEHR SICHERES PASSWORT         # Passwort für den Benutzer/PHP
+# Root Passwort für die Datenbank
+MYSQL_ROOT_PW=SEHR SICHERES PASSWORT
+# Passwort für den Benutzer/PHP
+MYSQL_PW=SEHR SICHERES PASSWORT
 
-MYSQL_HOST=mysql                        # Die IP/Hostname vom Datenbank Container
-MYSQL_DB_NAME=tresor                    # Der Name der Datenbank
-MYSQL_USER=admin                        # Der Benutzername für die Datenbank/PHP
+# Die IP/Hostname vom Datenbank Container
+MYSQL_HOST=mysql
+# Der Name der Datenbank
+MYSQL_DB_NAME=tresor
+# Der Benutzername für die Datenbank/PHP
+MYSQL_USER=admin
 ```
 
 Docker Container starten
