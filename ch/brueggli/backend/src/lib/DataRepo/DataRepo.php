@@ -211,11 +211,13 @@ class DataRepo
 		$value = current($id);
 
 		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
-		$stmt->bindParam("column", static::$sorting["sort"]);
-		$stmt->bindParam("order", static::$sorting["order"]);
 
-		$stmt->bindParam("search", $search);
-		$stmt->bindParam("value", $value);
+		$stmt->bindParams([
+			"column" => static::$sorting["sort"],
+			"order" => static::$sorting["order"],
+			"search" => $search,
+			"value" => $value
+		]);
 
 		try {
 			$stmt->execute();
@@ -232,8 +234,11 @@ class DataRepo
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
 
 		$stmt->bindParam("page", $offset, PDO::PARAM_INT);
-		$stmt->bindParam("search", $search);
-		$stmt->bindParam("value", $value);
+
+		$stmt->bindParams([
+			"search" => $search,
+			"value" => $value
+		]);
 
 		try {
 			$stmt->execute();
@@ -269,11 +274,13 @@ class DataRepo
 	 */
 	public function getById(int $id): object|null
 	{
-		$sql = $this->baseFetchSql() . " AND " . $this->class::PRIMARY_KEY . " = :id";
+		$sql = $this->baseFetchSql() . " AND " . $this->class::PRIMARY_KEY . " = :__id";
+
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
+		$stmt->bindParam("__id", $id, PDO::PARAM_INT);
 
 		try {
-			$stmt->execute(["id" => $id]);
+			$stmt->execute();
 			$result = $stmt->fetch();
 		} catch (PDOException $e) {
 			throw new PDOException("Error getting data: " . $e->getMessage());
@@ -333,11 +340,13 @@ class DataRepo
 		self::serializeFields($keyVal);
 		$sql = "INSERT INTO " . $model::TABLE_NAME . " (" . implode(", ", array_keys($keyVal))
 			. ") VALUES (:" . implode(", :", array_keys($keyVal)) . ")";
+
 		$dbh = getDbh(self::$callback, self::$callbackError);
 		$stmt = $dbh->prepare($sql);
+		$stmt->bindParams($keyVal);
 
 		try {
-			$success = $stmt->execute($keyVal);
+			$success = $stmt->execute();
 			$model->setId((int)$dbh->lastInsertId());
 		} catch (PDOException $e) {
 			throw new PDOException("Error inserting data: " . $e->getMessage());
@@ -356,9 +365,10 @@ class DataRepo
 	 */
 	public static function delete(mixed $model): bool
 	{
-		$sql = "DELETE FROM " . $model::TABLE_NAME . " WHERE " . $model::PRIMARY_KEY . " = :id";
+		$sql = "DELETE FROM " . $model::TABLE_NAME . " WHERE " . $model::PRIMARY_KEY . " = :__id";
+
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
-		$stmt->bindValue(":id", $model->id(), PDO::PARAM_INT);
+		$stmt->bindValue("__id", $model->id(), PDO::PARAM_INT);
 
 		try {
 			$stmt->execute();
@@ -390,10 +400,11 @@ class DataRepo
 			. " WHERE " . $model::PRIMARY_KEY . " = :__id";
 
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
-		$keyVal["__id"] = $model->id();
+		$stmt->bindValue("__id", $model->id(), PDO::PARAM_INT);
+		$stmt->bindParams($keyVal);
 
 		try {
-			return $stmt->execute($keyVal);
+			return $stmt->execute();
 		} catch (PDOException $e) {
 			throw new PDOException("Error updating data: " . $e->getMessage());
 		}
@@ -411,10 +422,12 @@ class DataRepo
 	public function getByField(string $field, mixed $value): array|null
 	{
 		$sql = $this->baseFetchSql() . " AND " . $field . " = :" . $field;
+
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
+		$stmt->bindParam($field, $value);
 
 		try {
-			$stmt->execute([$field => $value]);
+			$stmt->execute();
 			$result = $stmt->fetchAll();
 		} catch (PDOException $e) {
 			throw new PDOException("Error getting data: " . $e->getMessage());
@@ -452,10 +465,12 @@ class DataRepo
 	{
 		$mapFn = fn($field) => $field . " = :" . $field;
 		$sql = $this->baseFetchSql() . " AND " . implode(" AND ", array_map($mapFn, array_keys($fields)));
+
 		$stmt = getDbh(self::$callback, self::$callbackError)->prepare($sql);
+		$stmt->bindParams($fields);
 
 		try {
-			$stmt->execute($fields);
+			$stmt->execute();
 			$result = $stmt->fetchAll();
 		} catch (PDOException $e) {
 			throw new PDOException("Error getting data: " . $e->getMessage());
