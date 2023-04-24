@@ -3,7 +3,6 @@
 namespace controller;
 
 use Exception;
-use ReflectionException;
 
 use JetBrains\PhpStorm\NoReturn;
 use lib\DataRepo\DataRepo;
@@ -13,13 +12,12 @@ use model\Member;
 use model\SecretKey;
 use model\Password;
 
-use trait\getter;
-
-use function util\getArrayKeys;
-
 class OrganizationController extends AdminController
 {
-	use getter;
+	public function __construct()
+	{
+		parent::__construct("organization");
+	}
 
 	/**
 	 * Sucht Organisationen anhand des Suchstrings und gibt sie in paginierter Form zurück.

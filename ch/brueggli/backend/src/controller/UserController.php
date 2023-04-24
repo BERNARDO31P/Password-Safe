@@ -12,14 +12,15 @@ use model\User;
 use model\Member;
 use model\SecretKey;
 
-use trait\getter;
-
 use function util\getArrayKeys;
 use function util\removeArrayKeys;
 
 class UserController extends AdminController
 {
-	use getter;
+	public function __construct()
+	{
+		parent::__construct("user");
+	}
 
 	/**
 	 * Sucht Benutzer anhand des Suchstrings und gibt sie in paginierter Form zurück.

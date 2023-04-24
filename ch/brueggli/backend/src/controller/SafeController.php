@@ -12,11 +12,12 @@ use model\Organization;
 use model\SecretKey;
 use model\Password;
 
-use trait\getter;
-
 class SafeController extends AdminController
 {
-	use getter;
+	public function __construct()
+	{
+		parent::__construct("safe");
+	}
 
 	/**
 	 * Sucht nach Passwörtern innerhalb einer Organisation.

@@ -18,7 +18,7 @@ trait getter
 	 * @param int $id Die ID des Benutzers
 	 * @return object Das Benutzerobjekt mit der angegebenen ID
 	 */
-	private function _getUser(int $id): object
+	protected function _getUser(int $id): object
 	{
 		$user = DataRepo::of(User::class)->getById($id);
 
@@ -39,7 +39,7 @@ trait getter
 	 * @param int $id Die ID der Organisation
 	 * @return object Die Organisation mit der angegebenen ID
 	 */
-	private function _getOrganization(int $id): object
+	protected function _getOrganization(int $id): object
 	{
 		$org = DataRepo::of(Organization::class)->getById($id);
 
