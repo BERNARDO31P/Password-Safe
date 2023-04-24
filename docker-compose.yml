@@ -14,7 +14,6 @@ services:
       - ./logs:/usr/src/backend/logs
       - ./ch/brueggli/backend/src/.:/usr/src/backend
       - /usr/src/backend/vendor
-    command: php-fpm -R
   nginx:
     restart: always
     build:

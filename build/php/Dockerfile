@@ -34,3 +34,6 @@ ENV TZ="Europe/Zurich"
 
 # Setzt das Arbeitsverzeichnis für den finalen Container
 WORKDIR /usr/src/backend
+
+# Startet PHP-FPM im finalen Container mit dem Parameter -R (root)
+CMD ["/usr/local/sbin/php-fpm", "-R"]
